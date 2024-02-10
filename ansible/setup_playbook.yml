@@ -1,0 +1,12 @@
+- name: Setup playbook
+  hosts: localhost
+  become: true
+
+  tasks:
+    - include_vars: vars.yml
+    # - include_vars: custom_vars.yml
+
+    - name: Include common role
+      import_role:
+        name: common
+

@@ -1,0 +1,54 @@
+---
+# Taken from the lecture week 6
+ 
+  - name: Update packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+  - name: Docker Key
+    rpm_key:
+      state: present
+      key: "https://download.docker.com/linux/centos/gpg"
+  - name: Docker Repo
+    ansible.builtin.yum_repository:
+      baseurl: "https://download.docker.com/linux/centos/$releasever/$basearch/stable"
+      state: present
+      name: "Docker"
+      description: "Docker repo"
+  - name: Install Docker 
+    ansible.builtin.dnf:
+      name: "docker-ce"
+      state: latest
+  - name: Install Docker CLI
+    ansible.builtin.dnf:
+      name: "docker-ce-cli"
+      state: latest
+  - name: Install Containerd
+    ansible.builtin.dnf:
+      name: "containerd.io"
+      state: latest
+  - name: Install Docker BuildX Plugin
+    ansible.builtin.dnf:
+      name: "docker-buildx-plugin"
+      state: latest
+  - name: Install Docker Compose Plugin
+    ansible.builtin.dnf:
+      name: "docker-compose-plugin"
+      state: latest
+  - name: Enable Containerd Service
+    ansible.builtin.service:
+      name: containerd
+      enabled: true
+      state: started
+  - name: Enable Docker Service
+    ansible.builtin.service:
+      name: docker
+      enabled: true
+      state: started
+  - name: Add ec2-user to the docker group
+    ansible.builtin.user:
+      append: true
+      groups: docker
+      name: ec2-user
+  - name: Log out and back in to apply changes
+    ansible.builtin.shell: "newgrp docker"

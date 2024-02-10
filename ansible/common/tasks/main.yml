@@ -1,0 +1,37 @@
+- name: Check if /mnt/data is already mounted
+  command: mount
+  register: mount_info
+  
+- name: Partition and mount the disk
+  include_tasks: tasks/partition_mount_disk.yml
+  when: "'/mnt/data' not in mount_info.stdout"
+
+- name: install pip3
+  dnf:
+    name: python3-pip
+    state: present
+
+- name: Update pip
+  pip:
+    name: pip
+    state: latest
+
+- name: Check if Docker is already installed
+  ansible.builtin.stat:
+    path: /usr/bin/docker
+  register: docker_installation
+
+- name: Install Docker
+  include_tasks: tasks/install_docker.yml
+  when: not docker_installation.stat.exists
+
+- name: Check if Repo is already installed
+  ansible.builtin.stat:
+    path: "{{ repo_dir }}"
+  register: repo_installation
+
+- name: Install Repo
+  include_tasks: tasks/install_repo.yml
+  when: not repo_installation.stat.exists  
+
+- include_tasks: tasks/update_repo.yml
