@@ -18,11 +18,14 @@ asr_pipeline = pipeline(
     model="openai/whisper-base",
 )
 
-# diarization_pipeline.to(torch.device("cpu"))
+diarization_pipeline.to(torch.device("cpu"))
+# max memory for diarization model
+diarization_pipeline.to
 
 final_pipeline = ASRDiarizationPipeline(
     asr_pipeline=asr_pipeline, diarization_pipeline=diarization_pipeline
 )
+final_pipeline.embedding_batch_size=1
 
 def tuple_to_string(start_end_tuple, ndigits=1):
     return str((round(start_end_tuple[0], ndigits), round(start_end_tuple[1], ndigits)))
@@ -37,7 +40,7 @@ def format_as_transcription(raw_segments):
     )
 
 print("Running pipeline")
-outputs = final_pipeline('audio_example.mp3')
+outputs = final_pipeline('./data/audio_example.mp3')
 
 speakers = {}
 for item in outputs:
