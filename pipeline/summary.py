@@ -1,14 +1,17 @@
 from transformers import pipeline
 import json
 
-transcript = ""
-with open('../data/transcript.json', 'r') as f:
+def generate_summary(input_file, output_file):
+  transcript = ""
+  with open(input_file, 'r') as f:
     json_data = json.loads(f.read())
-    transcript = json_data['text']
+    transcript = json_data['transcript']
 
+  summary_pipeline = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+  summary_pipeline.d_model = 1024
+  result_summary = summary_pipeline(transcript[:1000])
 
-summary_pipeline = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
-summary_pipeline.d_model=1024
-result_summary = summary_pipeline(transcript[:1000])
-print(result_summary)
+  json_data['summary'] = result_summary[0]['summary_text']
+  with open(output_file, 'w') as f:
+    f.write(json.dumps(json_data, indent=2))
 

@@ -1,12 +1,14 @@
 from transformers import pipeline
 import json
 
-asr_pipeline = pipeline(
+def transcribe_audio(audio_file, output_file):
+  asr_pipeline = pipeline(
     "automatic-speech-recognition",
     model="openai/whisper-base",
-)
+  )
 
-outputs = asr_pipeline("../data/audio_example.mp3")
+  outputs = asr_pipeline(audio_file)
 
-with open('../data/transcript.json', 'w') as f:
+  with open(output_file, 'w') as f:
     f.write(json.dumps(outputs))
+
