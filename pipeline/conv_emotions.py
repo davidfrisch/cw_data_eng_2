@@ -17,9 +17,24 @@ def process_emotions(input_file, output_file):
 
   for speaker_id in speakers:
     text = speakers[speaker_id]['text']
-    output = sentiment_pipeline(text)
-    speakers[speaker_id]['emotions'] = sorted_data(output[0])
+    batch_size = 511
+    count = 0
+    for i in range(0, len(text), batch_size):
+      output = sentiment_pipeline(text[i:i+batch_size])
+      if i == 0:
+        speakers[speaker_id]['emotion'] = {}
+        for item in output[0]:
+          speakers[speaker_id]['emotion'][item['label']] = item['score']
 
+      else:
+        for item in output[0]:
+          speakers[speaker_id]['emotion'][item['label']] += item['score']
+          
+      count += 1
+      
+    for item in speakers[speaker_id]['emotion']:
+      speakers[speaker_id]['emotion'][item] = speakers[speaker_id]['emotion'][item] / count
+      
   with open(output_file, 'w') as f:
     f.write(json.dumps(speakers, indent=2))
     

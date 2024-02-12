@@ -18,8 +18,22 @@ def rank_conversations(input_file, output_file):
   
   for speaker_id in speakers:
     text = speakers[speaker_id]['text']
-    output = rank_pipeline(text)
-    speakers[speaker_id]['rank'] = output[0]
+    count = 0
+    for i in range(0, len(text), 511):
+      output = rank_pipeline(text[i:i+511])
+      if i == 0:
+        label = int(output[0]['label'].split(' ')[0])
+        speakers[speaker_id]['rank'] = {}
+        speakers[speaker_id]['rank']['score'] = label
+        
+      else:
+        speakers[speaker_id]['rank']['score'] += int(output[0]['label'].split(' ')[0])
+        
+      
+      count += 1
+    
+    # Average the rank
+    speakers[speaker_id]['rank']['score'] = speakers[speaker_id]['rank']['score'] / count
 
 
   with open(output_file, 'w') as f:
