@@ -1,6 +1,8 @@
 from transformers import pipeline
 import json
+from prefect import task
 
+@task
 def transcribe_audio(audio_file, output_file):
   asr_pipeline = pipeline(
     "automatic-speech-recognition",

@@ -1,6 +1,8 @@
 from transformers import pipeline
 import json
-  
+from prefect import task
+
+@task
 def process_emotions(input_file, output_file):
 
   sentiment_pipeline = pipeline(

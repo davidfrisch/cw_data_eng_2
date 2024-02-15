@@ -1,6 +1,8 @@
 from transformers import pipeline
 import json
+from prefect import task
 
+@task
 def rank_conversations(input_file, output_file):
   json_data = {}
   with open(input_file, 'r') as f:

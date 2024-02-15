@@ -5,6 +5,9 @@ import json
 from dotenv import load_dotenv
 load_dotenv('../.env')
 import os
+from prefect import task
+
+@task
 def diarization(input_audio, output_file):
   diarization_pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
