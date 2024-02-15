@@ -1,10 +1,10 @@
 - name: Setup playbook
-  hosts: localhost
+  hosts: client,cluters
   become: true
 
   tasks:
     - include_vars: vars.yml
-    # - include_vars: custom_vars.yml
+    - include_vars: custom_vars.yml
 
     - name: Include common role
       import_role:
