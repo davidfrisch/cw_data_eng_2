@@ -25,12 +25,3 @@ def pipeline(audio_file: str):
     
     return output_summary
   
-
-if __name__ == "__main__":
-    pipeline.deploy(
-        name="audio-pipeline", 
-        work_pool_name="default-agent-pool", 
-        push=False,
-        build=False,
-        image="discdiver/no-build-image:1.0",
-    )

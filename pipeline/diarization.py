@@ -22,8 +22,9 @@ def diarization(input_audio, output_file):
   final_pipeline = ASRDiarizationPipeline(
     asr_pipeline=asr_pipeline, diarization_pipeline=diarization_pipeline
   )
-  final_pipeline.embedding_batch_size=1
-  final_pipeline.segmentation_batch_size=1
+  
+  final_pipeline.embedding_batch_size=0.5
+  final_pipeline.segmentation_batch_size=0.5
 
   outputs = final_pipeline(input_audio)
   

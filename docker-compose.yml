@@ -1,8 +1,8 @@
-version: "3"
+version: "3.8"
 services:
   ### Prefect postgres
   postgres:
-    image: davidfrisch/postgres
+    image: 10.0.8.191:5000/postgres
     container_name: postgres
     build:
       context: ./database
@@ -12,6 +12,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     expose:
       - 5432
     volumes: 
@@ -24,6 +28,10 @@ services:
     entrypoint: ['prefect', 'server', 'start', '--host', '0.0.0.0']
     environment:
       - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/prefect
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     expose:
       - 4200
     volumes:
@@ -33,21 +41,30 @@ services:
   caddy:
     image: caddy:2.7.6
     container_name: caddy
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     ports:
       - "80:80"
     depends_on:
       - prefect
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
 
   agent:
-    image: davidfrisch/prefect
-    container_name: agent
+    image: 10.0.8.191:5000/prefect
+    deploy:
+      replicas: 2
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.role==worker
     build:
       context: .
-      dockerfile: Dockerfile.prefect
+      dockerfile: Dockerfile.agent
     env_file:
       - .env
     entrypoint: ['prefect', 'agent',  'start', '-p', 'default-agent-pool', '--work-queue', 'test']
