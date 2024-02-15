@@ -1,0 +1,7 @@
+{
+	auto_https off
+}
+
+http://ec2-3-8-140-24.eu-west-2.compute.amazonaws.com {
+    reverse_proxy http://prefect:4200
+}

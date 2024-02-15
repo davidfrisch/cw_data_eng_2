@@ -2,5 +2,5 @@
 pyannote.audio 
 git+https://github.com/davidfrisch/speechbox.git 
 transformers
-prefect
 python-dotenv
+prefect

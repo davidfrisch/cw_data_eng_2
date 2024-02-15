@@ -1,6 +1,5 @@
-version: "3.9"
+version: "3"
 services:
-
   ### Prefect postgres
   postgres:
     image: davidfrisch/postgres
@@ -17,5 +16,46 @@ services:
       - 5432
     volumes: 
       - db:/var/lib/postgresql/data
-    
-  
+
+
+  prefect:
+    image: prefecthq/prefect:2.14.12-python3.11
+    container_name: prefect
+    entrypoint: ['prefect', 'server', 'start', '--host', '0.0.0.0']
+    environment:
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/prefect
+    expose:
+      - 4200
+    volumes:
+      - ./pipeline:/pipeline
+      - ./data:/data
+
+  caddy:
+    image: caddy:2.7.6
+    container_name: caddy
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+    depends_on:
+      - prefect
+
+  agent:
+    image: davidfrisch/prefect
+    container_name: agent
+    build:
+      context: .
+      dockerfile: Dockerfile.prefect
+    env_file:
+      - .env
+    entrypoint: ['prefect', 'agent',  'start', '-p', 'default-agent-pool', '--work-queue', 'test']
+    volumes:
+      - ./pipeline:/pipeline
+      - ./data:/data
+
+volumes:
+  caddy_data:
+  caddy_config:
+  db:

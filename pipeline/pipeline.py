@@ -8,23 +8,29 @@ from conv_rank import rank_conversations
 from summary import generate_summary
 from prefect import flow
 
-@flow
-def pipeline(audio_file):
+@flow(log_prints=True)
+def pipeline(audio_file: str):
     # 1. diarization
-    output_diarization = "../data/output_1.json"
+    output_diarization = "/data/output_1.json"
     diarization(audio_file, output_diarization)
     # 2. Conversation Ranking
-    output_rank = "../data/output_2.json"
+    output_rank = "/data/output_2.json"
     rank_conversations(output_diarization, output_rank)
     # 3. Emotion per speaker
-    output_emotions = "../data/output_3.json"
+    output_emotions = "/data/output_3.json"
     process_emotions(output_rank, output_emotions)
     # 4. Summary
-    output_summary = "../data/output_4.json"
+    output_summary = "/data/output_4.json"
     generate_summary(output_diarization, output_summary)
     
     return output_summary
   
-  
+
 if __name__ == "__main__":
-    pipeline("../data/audio_example.mp3")
+    pipeline.deploy(
+        name="audio-pipeline", 
+        work_pool_name="default-agent-pool", 
+        push=False,
+        build=False,
+        image="discdiver/no-build-image:1.0",
+    )
