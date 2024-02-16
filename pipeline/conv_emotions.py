@@ -12,8 +12,10 @@ def process_emotions(input_file, output_file):
   )
 
   speakers = {}
+  data = None
   with open(input_file, 'r') as f:
-    speakers = json.loads(f.read())
+    data = json.loads(f.read())
+    speakers = data['speakers']
 
   sorted_data = lambda y: sorted(y, key=lambda x: x["score"], reverse=True)
 
@@ -36,7 +38,8 @@ def process_emotions(input_file, output_file):
       
     for item in speakers[speaker_id]['emotion']:
       speakers[speaker_id]['emotion'][item] = speakers[speaker_id]['emotion'][item] / count
-      
+  
+  data['speakers'] = speakers
   with open(output_file, 'w') as f:
-    f.write(json.dumps(speakers, indent=2))
+    f.write(json.dumps(data, indent=2))
     

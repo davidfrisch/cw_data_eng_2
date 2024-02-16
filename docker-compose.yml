@@ -21,6 +21,28 @@ services:
     volumes: 
       - db:/var/lib/postgresql/data
 
+  caddy:
+    image: caddy:2.7.6
+    container_name: caddy
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - "80:80"
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+        - 5672:5672
+        - 15672:15672
 
   prefect:
     image: prefecthq/prefect:2.14.12-python3.11
@@ -38,39 +60,23 @@ services:
       - ./pipeline:/pipeline
       - ./data:/data
 
-  caddy:
-    image: caddy:2.7.6
-    container_name: caddy
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
-    ports:
-      - "80:80"
-    depends_on:
-      - prefect
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-
-  agent:
-    image: 10.0.8.191:5000/prefect
-    deploy:
-      replicas: 2
-      placement:
-        max_replicas_per_node: 1
-        constraints:
-          - node.role==worker
-    build:
-      context: .
-      dockerfile: Dockerfile.agent
-    env_file:
-      - .env
-    entrypoint: ['prefect', 'agent',  'start', '-p', 'default-agent-pool', '--work-queue', 'test']
-    volumes:
-      - ./pipeline:/pipeline
-      - ./data:/data
+  # agent:
+  #   image: 10.0.8.191:5000/prefect:latest
+  #   deploy:
+  #     replicas: 4
+  #     placement:
+  #       max_replicas_per_node: 1
+  #       constraints:
+  #         - node.role==worker
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.agent
+  #   env_file:
+  #     - .env
+  #   entrypoint: ['prefect', 'agent',  'start', '-p', 'default-agent-pool', '--work-queue', 'test']
+  #   volumes:
+  #   #   - ./pipeline:/pipeline
+  #     - /shared/ec2-user:/data
 
 volumes:
   caddy_data:

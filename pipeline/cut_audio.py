@@ -20,20 +20,25 @@ class SplitWavAudioMubin():
         
     def multiple_split(self, min_per_split):
         total_mins = math.ceil(self.get_duration() / 60)
-        for i in range(0, total_mins, min_per_split):
-            split_fn = str(i) + '_' + self.file_name
+        filenames = []
+        for index, i in enumerate(range(0, total_mins, min_per_split)):
+            split_fn = str(index) + '_' + self.file_name
             self.single_split(i, i+min_per_split, split_fn)
-            print(str(i) + ' Done')
+            filenames.append(split_fn)
+            print(str(index) + ' Done')
             if i == total_mins - min_per_split:
                 print('All splited successfully')
+                
+        return filenames
 
-    
-def cut_audio(input_file, output_folder, duration_in_minutes):    
+
+def cut_audio(input_file, output_folder, min_per_split):    
   if not os.path.exists(output_folder):
     os.makedirs(output_folder)
-  split_wav = SplitWavAudioMubin(input_file, output_folder)
-  split_wav.multiple_split(min_per_split=5)
   
+  split_wav = SplitWavAudioMubin(input_file, output_folder)
+  filenames = split_wav.multiple_split(min_per_split)
+  return filenames
 
 
 # cut_audio('/mnt/data/cw_data_eng_2/data/wavs/0638.wav', '/mnt/data/cw_data_eng_2/data/output', 5)

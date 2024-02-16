@@ -1,8 +1,9 @@
 from transformers import pipeline
 import json
-from prefect import task
+from prefect import flow
+from constants import DATA_DIR
 
-@task
+@flow
 def generate_summary(input_file, output_file):
   transcript = ""
   with open(input_file, 'r') as f:
@@ -17,3 +18,5 @@ def generate_summary(input_file, output_file):
   with open(output_file, 'w') as f:
     f.write(json.dumps(json_data, indent=2))
 
+if __name__ == '__main__':
+  generate_summary(input_file=f"{DATA_DIR}/0638_results/0638.json", output_file=f"{DATA_DIR}/0638_results/summary.json")
