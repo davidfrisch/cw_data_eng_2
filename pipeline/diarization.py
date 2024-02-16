@@ -10,7 +10,7 @@ from prefect import task
 @task
 def diarization(input_audio, output_file):
   diarization_pipeline = Pipeline.from_pretrained(
-    "pyannote/speaker-diarization-3.1",
+    "pyannote/speaker-diarization-3.0",
     use_auth_token=os.getenv("HF_TOKEN")
   )
 

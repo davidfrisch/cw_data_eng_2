@@ -9,7 +9,7 @@ def generate_summary(input_file, output_file):
     json_data = json.loads(f.read())
     transcript = json_data['transcript']
 
-  summary_pipeline = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+  summary_pipeline = pipeline("summarization", model="Falconsai/text_summarization")
   summary_pipeline.d_model = 1024
   result_summary = summary_pipeline(transcript[:1000])
 
