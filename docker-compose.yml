@@ -1,5 +1,16 @@
 version: "3.8"
 services:
+
+  nginx:
+    image: nginx:stable-alpine-slim
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - rabbitmq
+
   ### Prefect postgres
   postgres:
     image: 10.0.8.191:5000/postgres
@@ -21,28 +32,13 @@ services:
     volumes: 
       - db:/var/lib/postgresql/data
 
-  caddy:
-    image: caddy:2.7.6
-    container_name: caddy
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
-    ports:
-      - "80:80"
-    depends_on:
-      - rabbitmq
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq
     ports:
         - 5672:5672
-        - 15672:15672
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
 
   prefect:
     image: prefecthq/prefect:2.14.12-python3.11
@@ -79,6 +75,4 @@ services:
   #     - /shared/ec2-user:/data
 
 volumes:
-  caddy_data:
-  caddy_config:
   db:
