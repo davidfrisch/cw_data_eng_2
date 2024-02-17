@@ -2,7 +2,7 @@ import pika, sys, os
 from pipeline import pipeline
 from multiprocessing import Process
 from functools import partial
-
+import time
 
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', '5672'))
@@ -14,8 +14,11 @@ def main():
         decoded_body = body.decode()
         runProcess = Process(target=pipeline,args=(decoded_body,))
         runProcess.start()
-        runProcess.join()
-    
+        
+        while runProcess.is_alive():
+            time.sleep(1)
+            conn.process_data_events()
+
           
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print(" [x] Done")

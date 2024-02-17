@@ -26,18 +26,18 @@ def process_emotions(input_file, output_file):
     for i in range(0, len(text), batch_size):
       output = sentiment_pipeline(text[i:i+batch_size])
       if i == 0:
-        speakers[speaker_id]['emotion'] = {}
+        speakers[speaker_id]['emotions'] = {}
         for item in output[0]:
-          speakers[speaker_id]['emotion'][item['label']] = item['score']
+          speakers[speaker_id]['emotions'][item['label']] = item['score']
 
       else:
         for item in output[0]:
-          speakers[speaker_id]['emotion'][item['label']] += item['score']
+          speakers[speaker_id]['emotions'][item['label']] += item['score']
           
       count += 1
       
-    for item in speakers[speaker_id]['emotion']:
-      speakers[speaker_id]['emotion'][item] = speakers[speaker_id]['emotion'][item] / count
+    for item in speakers[speaker_id]['emotions']:
+      speakers[speaker_id]['emotions'][item] = speakers[speaker_id]['emotions'][item] / count
   
   data['speakers'] = speakers
   with open(output_file, 'w') as f:
