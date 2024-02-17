@@ -84,7 +84,7 @@ def diarization(audio_file: str, output_folder: str, split_duration: int= 5):
   for file_path in audio_splitted_filenames:
     filename = os.path.basename(file_path).split('.')[0]
     output_diarization = f"{output_folder}/{filename}.json"
-    # child_diarization(f"{output_folder}/{file_path}", output_diarization)
+    child_diarization(f"{output_folder}/{file_path}", output_diarization)
     output_files.append(output_diarization)
     
   return assemble_diarization_results(output_files)
