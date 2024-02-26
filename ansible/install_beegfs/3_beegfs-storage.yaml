@@ -1,0 +1,34 @@
+- name: BeegGFS Common Configuration
+  hosts: coursemachines
+  become: true
+  become_user: root
+  tasks:
+  - name: Clear old targets
+    ansible.builtin.file:
+      path: /mnt/data/beegfs_data
+      state: absent
+  - name: Create target location
+    ansible.builtin.file:
+      path: /mnt/data/beegfs_data/target
+      state: directory
+  - name: Configure client
+    ansible.builtin.command:
+      cmd: /opt/beegfs/sbin/beegfs-setup-storage -p /mnt/data/beegfs_data/target -m ip-10-0-8-191
+  - name: Auth file
+    ansible.builtin.copy:
+      src: connauthfile
+      dest: /etc/beegfs/connauthfile
+      owner: root
+      group: root
+      mode: 400
+  - name: fix storage conf
+    ansible.builtin.replace:
+      path: /etc/beegfs/beegfs-storage.conf
+      regexp: 'connAuthFile                 ='
+      replace: 'connAuthFile=/etc/beegfs/connauthfile'
+  - name: start storage
+    ansible.builtin.systemd_service:
+      name: beegfs-storage
+      state: started
+      enabled: true
+

@@ -5,3 +5,4 @@ venv
 data
 ansible/custom_vars.yml
 *-deployment.yaml
+connauthfile

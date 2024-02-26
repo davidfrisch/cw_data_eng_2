@@ -1,0 +1,30 @@
+- name: Stop all BeeGFS instances
+  hosts: coursemachines
+  become: true
+  become_user: root
+  tasks:
+    - name: stop mgmtd
+      ansible.builtin.systemd_service:
+        name: beegfs-mgmtd
+        state: stopped
+        enabled: true
+    - name: stop medadata
+      ansible.builtin.systemd_service:
+        name: beegfs-meta
+        state: stopped
+        enabled: true
+    - name: stop storage
+      ansible.builtin.systemd_service:
+        name: beegfs-storage
+        state: stopped
+        enabled: true
+    - name: stop helperd
+      ansible.builtin.systemd_service:
+        name: beegfs-helperd
+        state: stopped
+        enabled: true
+    - name: stop client
+      ansible.builtin.systemd_service:
+        name: beegfs-client
+        state: stopped
+        enabled: true
