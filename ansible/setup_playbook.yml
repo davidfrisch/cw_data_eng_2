@@ -1,5 +1,5 @@
 - name: Setup playbook
-  hosts: clusters
+  hosts: client
   become: true
 
   tasks:

@@ -25,6 +25,10 @@
   include_tasks: tasks/install_docker.yml
   when: not docker_installation.stat.exists
 
+- name: Move Docker to /mnt/data
+  include: tasks/move_docker_folders.yml
+  when: not docker_installation.stat.exists
+
 - name: Check if Repo is already installed
   ansible.builtin.stat:
     path: "{{ repo_dir }}"

@@ -1,0 +1,21 @@
+
+
+- name: move Docker folders
+  ansible.builtin.copy:
+    remote_src: true
+    src: /var/lib/docker
+    dest: /mnt/data/
+
+- name: Update /etc/docker/daemon.json
+  ansible.builtin.copy:
+    content: |
+      {
+        "data-root": "/mnt/data/docker",
+        "insecure-registries": ["{{ groups['client'][0] }}:5000"]
+      }
+    dest: /etc/docker/daemon.json
+
+- name: Restard docker service
+  ansible.builtin.service:
+    name: docker
+    state: restarted

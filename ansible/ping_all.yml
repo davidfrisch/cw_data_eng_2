@@ -1,7 +1,7 @@
 - name: Ping all hosts
   hosts: all
-
   tasks:
+    - include_vars: custom_vars.yml
     - name: Ping all hosts
       ping:
       
