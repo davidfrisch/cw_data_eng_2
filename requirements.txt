@@ -6,3 +6,5 @@ python-dotenv
 prefect
 pydub
 onnxruntime
+sqlalchemy_utils
+psycopg2-binary

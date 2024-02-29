@@ -4,21 +4,63 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"context"
 
 	"github.com/gin-gonic/gin"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"backend/db"
 )
+
 
 type PipelineRequest struct {
 	AudioPath string `json:"audio_path"`
 }
 
 
+
+
+type Pipeline struct {
+	FlowRunId string `json:"flow_run_id"`
+	AudioPath string `json:"audio_path"`
+	VmWorkerId string `json:"vm_worker_id"`
+	Status string `json:"status"`
+}
+
+
+
 func addPipelineRoutes(rg *gin.RouterGroup) {
-	pipeline := rg.Group("/pipeline")
+	pipeline := rg.Group("/pipelines")
+	pipeline.GET("/", getPipelinesHandler)
 	pipeline.POST("/new", AddPipelineHandler)
 }
 
+
+func getPipelinesHandler(c *gin.Context) {
+	rows, err := db.DB.Query(context.Background(), "SELECT * FROM audio_results")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query database"})
+		return
+	}
+	defer rows.Close()
+
+	var pipelines []Pipeline
+	for rows.Next() {
+		var pipeline Pipeline
+		err = rows.Scan(&pipeline.FlowRunId, &pipeline.AudioPath, &pipeline.VmWorkerId, &pipeline.Status)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan database rows"})
+			return
+		}
+		pipelines = append(pipelines, pipeline)
+	}
+
+	if len(pipelines) == 0 {
+		c.JSON(http.StatusOK, []Pipeline{})
+		return
+	}
+
+	c.JSON(http.StatusOK, pipelines)
+}
 
 
 func AddPipelineHandler(c *gin.Context) {
@@ -74,7 +116,7 @@ func SendMessageToRabbitMQ(audioPath string) error {
 
 	// Declare a queue named "hello"
 	q, err := ch.QueueDeclare(
-		"hello2", // Queue name
+		"hello", // Queue name
 		false,   // Durable
 		false,   // Delete when unused
 		false,   // Exclusive

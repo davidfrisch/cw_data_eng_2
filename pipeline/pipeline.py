@@ -1,4 +1,4 @@
-""" TMPDIR=/mnt/data pip install --upgrade pyannote.audio git+https://github.com/davidfrisch/speechbox.git transformers prefect  --no-cache --cache-dir=/mnt/data/pip_cache """
+""" TMPDIdf -R=/mnt/data pip install --upgrade pyannote.audio git+https://github.com/davidfrisch/speechbox.git transformers prefect  --no-cache --cache-dir=/mnt/data/pip_cache """
 """ TMPDIR=/mnt/data pip install -r requirements.txt --no-cache --cache-dir=/mnt/data/pip_cache """
 import os 
 import json
