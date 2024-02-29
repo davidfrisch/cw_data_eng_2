@@ -9,7 +9,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - rabbitmq
+      - prefect
 
   ### Prefect postgres
   postgres:
@@ -32,17 +32,13 @@ services:
     volumes: 
       - db:/var/lib/postgresql/data
 
-  rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq
-    ports:
-        - 5672:5672
-    volumes:
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
 
   prefect:
-    image: prefecthq/prefect:2.14.12-python3.11
+    image: david/prefect:latest
     container_name: prefect
+    build:
+      context: ./pipeline
+      dockerfile: Dockerfile
     entrypoint: ['prefect', 'server', 'start', '--host', '0.0.0.0']
     environment:
       - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/prefect
@@ -52,27 +48,20 @@ services:
           - node.role == manager
     expose:
       - 4200
+    ports:
+      - "4200:4200"
     volumes:
       - ./pipeline:/pipeline
       - ./data:/data
 
-  # agent:
-  #   image: 10.0.8.191:5000/prefect:latest
-  #   deploy:
-  #     replicas: 4
-  #     placement:
-  #       max_replicas_per_node: 1
-  #       constraints:
-  #         - node.role==worker
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.agent
-  #   env_file:
-  #     - .env
-  #   entrypoint: ['prefect', 'agent',  'start', '-p', 'default-agent-pool', '--work-queue', 'test']
-  #   volumes:
-  #   #   - ./pipeline:/pipeline
-  #     - /shared/ec2-user:/data
+  agent:
+    image: david/prefect:latest
+    container_name: agent
+    environment:
+      - PREFECT_API_URL=http://ec2-35-178-107-122.eu-west-2.compute.amazonaws.com/api
+    entrypoint: ['python3', '/app/pipeline/pipeline.py']
+
+
 
 volumes:
   db:

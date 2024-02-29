@@ -2,12 +2,12 @@ package main
 
 import (
 	"backend/routes"
-	"backend/db"
+	"backend/external"
 )
 
 func main() {
-	db.InitDB()
-	defer db.CloseDB()
+	external.InitDB()
+	defer external.CloseDB()
 
 	routes.Run()
 }

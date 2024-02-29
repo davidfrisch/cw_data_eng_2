@@ -1,32 +1,25 @@
 package routes
 
 import (
-	"encoding/json"
+	"backend/external"
+	"context"
+	"fmt"
 	"net/http"
 	"os"
-	"context"
 
 	"github.com/gin-gonic/gin"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"backend/db"
 )
-
 
 type PipelineRequest struct {
 	AudioPath string `json:"audio_path"`
 }
 
-
-
-
 type Pipeline struct {
-	FlowRunId string `json:"flow_run_id"`
-	AudioPath string `json:"audio_path"`
+	FlowRunId  string `json:"flow_run_id"`
+	AudioPath  string `json:"audio_path"`
 	VmWorkerId string `json:"vm_worker_id"`
-	Status string `json:"status"`
+	Status     string `json:"status"`
 }
-
-
 
 func addPipelineRoutes(rg *gin.RouterGroup) {
 	pipeline := rg.Group("/pipelines")
@@ -34,9 +27,8 @@ func addPipelineRoutes(rg *gin.RouterGroup) {
 	pipeline.POST("/new", AddPipelineHandler)
 }
 
-
 func getPipelinesHandler(c *gin.Context) {
-	rows, err := db.DB.Query(context.Background(), "SELECT * FROM audio_results")
+	rows, err := external.DB.Query(context.Background(), "SELECT flow_run_id, audio_path FROM audio_results")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query database"})
 		return
@@ -45,12 +37,22 @@ func getPipelinesHandler(c *gin.Context) {
 
 	var pipelines []Pipeline
 	for rows.Next() {
+
 		var pipeline Pipeline
-		err = rows.Scan(&pipeline.FlowRunId, &pipeline.AudioPath, &pipeline.VmWorkerId, &pipeline.Status)
+		err := rows.Scan(&pipeline.FlowRunId, &pipeline.AudioPath)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan database rows"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan row"})
 			return
 		}
+
+		flowRunInfo, err := external.GetFlowRunInfo(pipeline.FlowRunId)
+		if err != nil {
+			fmt.Println(err)
+			pipeline.Status = "UNKNOWN"
+		} else {
+			pipeline.Status = flowRunInfo["state_type"].(string)
+		}
+
 		pipelines = append(pipelines, pipeline)
 	}
 
@@ -62,11 +64,9 @@ func getPipelinesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, pipelines)
 }
 
-
 func AddPipelineHandler(c *gin.Context) {
 	var request PipelineRequest
 
-	// Parse JSON request body
 	if err := c.BindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON format"})
 		return
@@ -86,69 +86,31 @@ func AddPipelineHandler(c *gin.Context) {
 		return
 	}
 
-	// Send message to RabbitMQ
-	err := SendMessageToRabbitMQ(request.AudioPath)
+	// Get deployment ids
+	deploymentId, err := external.GetDeploymentIdByName("pipeline-voice-analysis")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send message to RabbitMQ"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get deployment ids"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Pipeline added successfully"})
-}
-
-func SendMessageToRabbitMQ(audioPath string) error {
-	// RabbitMQ connection URL
-	amqpURL := "amqp://guest:guest@localhost:5672/"
-
-	// Connect to RabbitMQ
-	conn, err := amqp.Dial(amqpURL)
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	// Create a channel
-	ch, err := conn.Channel()
-	if err != nil {
-		return err
-	}
-	defer ch.Close()
-
-	// Declare a queue named "hello"
-	q, err := ch.QueueDeclare(
-		"hello", // Queue name
-		false,   // Durable
-		false,   // Delete when unused
-		false,   // Exclusive
-		false,   // No-wait
-		nil,     // Arguments
-	)
-	if err != nil {
-		return err
+	parameters := map[string]interface{}{
+		"audio_path": audioPath,
 	}
 
-	// Convert audioPath to JSON
-	messageBody, err := json.Marshal(map[string]string{"audio_path": audioPath})
+	flowRunId, err := external.CreateFlowRun(deploymentId, parameters)
 	if err != nil {
-		return err
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create flow run"})
+		return
 	}
 
-	// Publish the message to the "hello" queue
-	err = ch.Publish(
-		"",     // Exchange
-		q.Name, // Routing key
-		false,  // Mandatory
-		false,  // Immediate
-		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        messageBody,
-		},
-	)
+	_, err = external.DB.Exec(context.Background(), "INSERT INTO audio_results (flow_run_id, audio_path, status) VALUES ($1, $2, $3)", flowRunId, audioPath, "PENDING")
+
 	if err != nil {
-		return err
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	return nil
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Flow run %s created", flowRunId)})
 }
 
 func fileExists(path string) bool {

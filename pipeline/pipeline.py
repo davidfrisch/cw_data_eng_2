@@ -11,13 +11,10 @@ from summary import generate_summary
 from prefect import flow
 from prefect.client import get_client
 from constants import DATA_DIR
-from prefect import runtime
+from prefect_utils import get_flow_run_id
 from db import create_session
 from save_results import save_diarization_results, save_rank_results, save_emotions_results, save_summary_results
 from models.audio_results import AudioResults
-
-def get_flow_run_id():
-    return runtime.flow_run.id
 
 
 @flow(log_prints=True)
@@ -63,4 +60,7 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
         os.system(f"rm -rf {output_folder}")
   
 if __name__ == '__main__':
-  pipeline(audio_path=f"{DATA_DIR}/wavs/0638.wav")
+  pipeline.serve(name='pipeline-voice-analysis')
+  
+  
+  
