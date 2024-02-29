@@ -1,30 +1,38 @@
-- name: Stop all BeeGFS instances
+
+- name: Start client BeeGFS instance
+  hosts: client
+  become: true
+  become_user: root
+  tasks:
+    - name: start mgmtd
+      ansible.builtin.systemd_service:
+        name: beegfs-mgmtd
+        state: started
+        enabled: true
+    - name: start medadata
+      ansible.builtin.systemd_service:
+        name: beegfs-meta
+        state: started
+        enabled: true
+
+
+- name: Start all BeeGFS instances
   hosts: coursemachines
   become: true
   become_user: root
   tasks:
-    - name: stop mgmtd
-      ansible.builtin.systemd_service:
-        name: beegfs-mgmtd
-        state: stopped
-        enabled: true
-    - name: stop medadata
-      ansible.builtin.systemd_service:
-        name: beegfs-meta
-        state: stopped
-        enabled: true
-    - name: stop storage
+    - name: start storage
       ansible.builtin.systemd_service:
         name: beegfs-storage
-        state: stopped
+        state: started
         enabled: true
-    - name: stop helperd
+    - name: start helperd
       ansible.builtin.systemd_service:
         name: beegfs-helperd
-        state: stopped
+        state: started
         enabled: true
-    - name: stop client
+    - name: start client
       ansible.builtin.systemd_service:
         name: beegfs-client
-        state: stopped
+        state: started
         enabled: true

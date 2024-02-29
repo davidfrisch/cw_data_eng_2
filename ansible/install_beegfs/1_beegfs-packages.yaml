@@ -1,5 +1,5 @@
 - name: beegfs
-  hosts: coursemachines
+  hosts: host
   become: true
   become_user: root
   tasks:
