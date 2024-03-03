@@ -7,3 +7,4 @@ ansible/custom_vars.yml
 *-deployment.yaml
 connauthfile
 .env*
+node_modules
