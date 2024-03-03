@@ -1,7 +1,7 @@
-""" TMPDIdf -R=/mnt/data pip install --upgrade pyannote.audio git+https://github.com/davidfrisch/speechbox.git transformers prefect  --no-cache --cache-dir=/mnt/data/pip_cache """
 """ TMPDIR=/mnt/data pip install -r requirements.txt --no-cache --cache-dir=/mnt/data/pip_cache """
 import os 
 import json
+import sys
 os.environ['HF_HOME'] = '/mnt/data'
 
 from diarization import diarization
@@ -22,8 +22,16 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
     session = create_session()
     flow_run_id = get_flow_run_id()
     
-    new_audio_results = AudioResults(flow_run_id=flow_run_id, audio_path=audio_path, vm_worker_id='1')
-    session.add(new_audio_results)
+    vm_worker_id = os.environ.get('HOSTNAME')
+    update_audio_results = session.query(AudioResults).filter(AudioResults.flow_run_id == flow_run_id).first()
+    if not update_audio_results:
+        new_audio_results = AudioResults(flow_run_id=flow_run_id, audio_path=audio_path, vm_worker_id=vm_worker_id)
+        session.add(new_audio_results)
+    else:
+        update_audio_results.audio_path = audio_path
+        update_audio_results.vm_worker_id = vm_worker_id
+        session.add(update_audio_results)
+
     session.commit()
 
     if not os.path.exists(audio_path):
@@ -60,7 +68,11 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
         os.system(f"rm -rf {output_folder}")
   
 if __name__ == '__main__':
-  pipeline.serve(name='pipeline-voice-analysis')
+  if len(sys.argv) > 2 and sys.argv[1] == '--local':
+    path = sys.argv[2]
+    pipeline(audio_path=path)
+  else:
+    pipeline.serve(name='pipeline-voice-analysis')
   
   
   

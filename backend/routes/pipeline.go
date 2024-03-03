@@ -103,7 +103,7 @@ func AddPipelineHandler(c *gin.Context) {
 		return
 	}
 
-	_, err = external.DB.Exec(context.Background(), "INSERT INTO audio_results (flow_run_id, audio_path, status) VALUES ($1, $2, $3)", flowRunId, audioPath, "PENDING")
+	_, err = external.DB.Exec(context.Background(), "INSERT INTO audio_results (flow_run_id, audio_path) VALUES ($1, $2)", flowRunId, audioPath)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

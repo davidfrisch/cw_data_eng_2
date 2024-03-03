@@ -9,7 +9,7 @@ from prefect import flow, task
 import asyncio
 from typing import List
 from cut_audio import cut_audio
-
+from pyannote.audio import Pipeline
 
 @task(log_prints=True)
 def child_diarization(input_audio, output_file):
@@ -22,6 +22,9 @@ def child_diarization(input_audio, output_file):
     "automatic-speech-recognition",
     model="openai/whisper-base",
   )
+  
+  if not diarization_pipeline or not asr_pipeline:
+    raise ValueError("Error loading diarization or asr pipeline")
 
   final_pipeline = ASRDiarizationPipeline(
     asr_pipeline=asr_pipeline, diarization_pipeline=diarization_pipeline

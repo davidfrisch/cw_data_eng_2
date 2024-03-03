@@ -10,7 +10,6 @@ class AudioResults(Base):
     self.flow_run_id = flow_run_id
     self.audio_path = audio_path
     self.vm_worker_id = vm_worker_id
-    self.status = 'RUNNING'
     self.transcript = None
     self.summary = None
     self.speakers = []
@@ -18,7 +17,6 @@ class AudioResults(Base):
     
   flow_run_id = Column(String, primary_key=True)
   audio_path = Column(String)
-  status = Column(String)
   transcript = Column(String)
   summary = Column(String)
   vm_worker_id = Column(String)

@@ -79,7 +79,7 @@ func GetDeploymentIdByName(name string) (string, error) {
 }
 
 func makeRequest(method string, endpoint string, body []byte) ([]byte, error) {
-	url := "http://localhost:4200/api" + endpoint
+	url := "http://ec2-35-178-107-122.eu-west-2.compute.amazonaws.com/api" + endpoint
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err

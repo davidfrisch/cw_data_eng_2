@@ -11,7 +11,6 @@ services:
     depends_on:
       - prefect
 
-  ### Prefect postgres
   postgres:
     image: 10.0.8.191:5000/postgres
     container_name: postgres
@@ -33,6 +32,7 @@ services:
       - db:/var/lib/postgresql/data
 
 
+
   prefect:
     image: david/prefect:latest
     container_name: prefect
@@ -40,27 +40,34 @@ services:
       context: ./pipeline
       dockerfile: Dockerfile
     entrypoint: ['prefect', 'server', 'start', '--host', '0.0.0.0']
-    environment:
-      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/prefect
+    env_file:
+      - .env.compose
     deploy:
       placement:
         constraints:
           - node.role == manager
-    expose:
-      - 4200
-    ports:
-      - "4200:4200"
     volumes:
-      - ./pipeline:/pipeline
-      - ./data:/data
+      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+      - ./pipeline:/app/pipeline
 
   agent:
     image: david/prefect:latest
-    container_name: agent
-    environment:
-      - PREFECT_API_URL=http://ec2-35-178-107-122.eu-west-2.compute.amazonaws.com/api
+    env_file:
+      - .env.compose
     entrypoint: ['python3', '/app/pipeline/pipeline.py']
-
+    deploy:
+      endpoint_mode: vip
+      replicas: 1
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          memory: 3gb
+    volumes:
+      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+      - ./pipeline:/app/pipeline
 
 
 volumes:
