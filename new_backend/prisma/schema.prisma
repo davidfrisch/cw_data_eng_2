@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model audio_results {
+  flow_run_id  String     @id @db.VarChar
+  audio_path   String?    @db.VarChar
+  transcript   String?    @db.VarChar
+  summary      String?    @db.VarChar
+  vm_worker_id String?    @db.VarChar
+  date_added   DateTime?  @db.Timestamp(6)
+  date_updated DateTime?  @db.Timestamp(6)
+  speakers     speakers[]
+}
+
+model emotions_scores {
+  speaker_id   String    @db.VarChar
+  flow_run_id  String    @db.VarChar
+  name         String    @db.VarChar
+  score        Float?
+  date_added   DateTime? @db.Timestamp(6)
+  date_updated DateTime? @db.Timestamp(6)
+  speakers     speakers  @relation(fields: [speaker_id, flow_run_id], references: [speaker_id, flow_run_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([speaker_id, flow_run_id, name])
+}
+
+model speakers {
+  flow_run_id       String            @db.VarChar
+  speaker_id        String            @db.VarChar
+  text              String?           @db.VarChar
+  conversation_rate Float?
+  date_added        DateTime?         @db.Timestamp(6)
+  date_updated      DateTime?         @db.Timestamp(6)
+  emotions_scores   emotions_scores[]
+  audio_results     audio_results     @relation(fields: [flow_run_id], references: [flow_run_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([flow_run_id, speaker_id])
+}
