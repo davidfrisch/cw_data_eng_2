@@ -40,7 +40,7 @@ class PrefectClient {
       const response = await this.httpClient.get(`/flow_runs/${flowRunId}`);
       return response.data;
     } catch (error) {
-      console.error(error);
+      console.error("Error getting flow run info for flow run id: ", flowRunId);
       return { status: 'Failed' };
     }
   }
