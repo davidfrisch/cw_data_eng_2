@@ -13,6 +13,21 @@ const pipelines = {
     return await api.get("/pipelines");
   },
 
+  async create(data: any) {
+    return await api.post("/pipelines", data);
+  },
+
+  async get(id: string) {
+    return await api.get(`/pipelines/${id}`);
+  },
+
+  async getAudio(id: string) {
+    const response = await api.get(`/pipelines/${id}/audio`, {
+      responseType: "blob",
+    });
+    return response.data;
+  }
+
 }
 
 
