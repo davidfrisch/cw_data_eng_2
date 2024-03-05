@@ -4,7 +4,6 @@ set -e
 DIRECTORY=$(dirname $0)
 
 # Path in VMs
-PYTHON3_PATH=/mnt/data/dataEng1CW/venv/bin/python3
 SHARE_DIR="/mnt/beegfs/prefect_data"
 # DOCKER_SHARE_DIR="/data"
 
@@ -18,6 +17,7 @@ HOSTNAME=""
 DATABASE_NAME=audio_results
 DATABASE_USER=""
 DATABASE_PASS=""
+HF_TOKEN=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -26,6 +26,7 @@ while [[ "$#" -gt 0 ]]; do
         -db|--db-name) DATABASE_NAME="$2"; shift ;;
         -du|--db-user) DATABASE_USER="$2"; shift ;;
         -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
+        -t|--hf-token) HF_TOKEN="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
@@ -64,15 +65,15 @@ fi
 DOCKER_VITE_BACKEND_URL="http://backend:3001/v1"
 DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
 DOCKER_PREFECT_URL=http://prefect:4200
-DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$IP_ADDRESS:5432/$DATABASE_NAME"
-
+DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
+PREFECT_DATABASE_URL="postgresql+asyncpg://$DATABASE_USER:$DATABASE_PASS@postgres:5432/prefect"
 
 # For pipeline
-echo "PYTHON3_PATH=$PYTHON3_PATH" > $DIRECTORY/../pipeline/.env
 echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../pipeline/.env
 echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_UI_URL=$PREFECT_UI_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_API_URL=$PREFECT_API_URL" >> $DIRECTORY/../pipeline/.env
+echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
@@ -85,21 +86,10 @@ echo "VITE_PREFECT_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../frontend/.env
 
 ### Docker with .env.staging
 # For pipeline
-echo "PYTHON3_PATH=$PYTHON3_PATH" > $DIRECTORY/../.env.staging
-echo "SHARE_DIR=$DOCKER_SHARE_DIR" >> $DIRECTORY/../.env.staging
-
-# For database
-echo "POSTGRES_USER=$DATABASE_USER" > $DIRECTORY/../database/.env
-echo "POSTGRES_PASSWORD=$DATABASE_PASS" >> $DIRECTORY/../database/.env
-echo "POSTGRES_DB=$DATABASE_NAME" >> $DIRECTORY/../database/.env
-
-# For backend
-echo "DATABASE_URL=$DOCKER_DATABASE_URL" > $DIRECTORY/../backend/.env.staging
-echo "SHARE_DIR=$DOCKER_SHARE_DIR" >> $DIRECTORY/../backend/.env.staging
-
-# For frontend
-echo "VITE_BACKEND_URL=$DOCKER_VITE_BACKEND_URL" > $DIRECTORY/../frontend/.env.staging
-
-
+echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../.env.compose
+echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../.env.compose
+echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../.env.compose
+echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../.env.compose
+echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/../.env.compose
 
 echo "Finished setting up local environment variables."

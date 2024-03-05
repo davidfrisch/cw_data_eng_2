@@ -1,0 +1,44 @@
+name: Test Pipeline
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Run the setup script
+        run: |
+          ./scripts/node_setup_script.sh \
+              -h localhost \
+              -t ${{ secrets.HF_TOKEN }} \
+              -db audio_results \
+              -du ${{ secrets.PG_USER }} \
+              -dp ${{ secrets.PG_PASSWORD }} 
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build and run containers
+        run: |
+          docker-compose up -d
+
+      - name: Launch a pipeline
+        run: |
+          docker-compose exec -T cw_data_eng_2_agent_1 bash -c "python3 ./pipeline/pipeline.py --local /app/sample_data/audio_example.wav"
+
+      - name: Stop and remove containers
+        run: |
+          docker-compose down
+
+      
+
+      
