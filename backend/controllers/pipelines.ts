@@ -93,8 +93,10 @@ class PipelinesController {
     res.status(200).sendFile(pipeline.audio_path);
   }
 
-  public static async add(req: Request, res: Response): Promise<void> {
+  public static async addFromPath(req: Request, res: Response): Promise<void> {
     const { audio_path, pipeline_name = "pipeline-voice-analysis" } = req.body;
+
+    console.log("Here is the audio path: ", audio_path);
 
     if (!audio_path) {
       res.status(400).send("Audio file is required");

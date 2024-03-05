@@ -6,6 +6,7 @@ import { HealthRouter } from "./routes/health";
 import { pipelinesRouter } from "./routes/pipelines";
 import { checkDatabaseConnection } from "./middleware/check_health";
 import dotenv from "dotenv";
+
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -16,6 +17,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(checkDatabaseConnection());
+
+
 
 app.use("/v1/health", HealthRouter);
 app.use("/v1/pipelines", pipelinesRouter);
