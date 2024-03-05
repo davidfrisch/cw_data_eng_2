@@ -70,5 +70,19 @@ services:
       - ./pipeline:/app/pipeline
 
 
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    restart: always
+    volumes:
+      - /mnt/beegfs/prefect_data:/srv
+      - ./filebrowser/filebrowser.json:/.filebrowser.json 
+      # - ./filebrowser/filebrowser.json:/etc/config.json
+      # - ./filebrowser/filebrowser.db:/database.db
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
 volumes:
   db:
