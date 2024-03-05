@@ -14,7 +14,11 @@ const pipelines = {
   },
 
   async create(data: any) {
-    return await api.post("/pipelines", data);
+    return await api.post("/pipelines/add-file", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   },
 
   async get(id: string) {

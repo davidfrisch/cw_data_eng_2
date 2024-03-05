@@ -2,6 +2,7 @@ import { useState, FC, useEffect } from 'react';
 import api from '../../api';
 import './styles.css';
 import { useNavigate } from 'react-router-dom';
+import { PREFECT_UI_URL } from '../../constants';
 
 interface IBackendHealth {
   [key: string]: string;
@@ -34,6 +35,11 @@ const Navbar: FC = () => {
     const name = event.target.name;
     navigate(name);
   }
+
+  const handleVisitPrefect = () => {
+    const url = `${PREFECT_UI_URL}`;
+    window.open(url, '_blank');
+  }
     
   const pages = [
     { name: "home", label: "Pipelines" },
@@ -44,8 +50,9 @@ const Navbar: FC = () => {
     <nav className="navbar-container">
       <div className="navbar-menu">
         {pages.map((page, index) => (
-          <button key={index} name={page.name} onClick={handleClick}>{page.label}</button>
+          <button className='navbar-status-item' key={index} name={page.name} onClick={handleClick}>{page.label}</button>
         ))}
+        <button className='navbar-status-item' onClick={handleVisitPrefect}>Prefect UI</button>
       </div>
       <div className="navbar-status">
         {isLoading && <p>Loading...</p>}
