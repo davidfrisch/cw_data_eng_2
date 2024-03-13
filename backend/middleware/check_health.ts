@@ -11,7 +11,7 @@ export const checkDatabaseConnection = () => {
         return true;
       } catch (error) {
         console.error("Error connecting to Prisma");
-        
+
       }
       return false;
     };

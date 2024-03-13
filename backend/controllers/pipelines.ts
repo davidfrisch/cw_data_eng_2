@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import prisma from "../services/prisma_client";
 import prefectClient from "../services/prefect_client";
 import fs from "fs";
-import { audio_results } from "@prisma/client";
+import { Prisma, audio_results } from "@prisma/client";
 import { NEW_AUDIO_DIR, PIPELINES_AUDIO_DIR, SHARE_DIR } from "../constants";
 
 class PipelinesController {
@@ -17,6 +17,13 @@ class PipelinesController {
     const getHeadPipelines = pipelines.map(async (pipeline: audio_results) => {
       const flowRunInfo = await prefectClient.getFlowRunInfo(pipeline.flow_run_id);
       const { audio_path, flow_run_id, date_added, date_updated, vm_worker_id } = pipeline;
+      const status = flowRunInfo['state_type'];
+      let conversationRate: any = null;
+      if (status === "COMPLETED") {
+        const avgConversationRate = await prisma.speakers.groupBy({ by: ['flow_run_id'], _avg: { conversation_rate: true } });
+        conversationRate = avgConversationRate.find((avg: any) => avg.flow_run_id === flow_run_id)?._avg.conversation_rate
+        conversationRate = isNaN(conversationRate) ? null : Math.round(conversationRate);
+      }
       return {
         'status': flowRunInfo['state_type'],
         flow_run_id,
@@ -24,6 +31,7 @@ class PipelinesController {
         date_added,
         date_updated,
         vm_worker_id,
+        conversationRate
       };
     })
 
@@ -120,7 +128,7 @@ class PipelinesController {
     const new_audio_files = fs.readdirSync(NEW_AUDIO_DIR);
     const files: string[] = [];
     for (const audio_file of new_audio_files) {
-      if (!audio_file.endsWith(".wav")) {
+      if (!audio_file.endsWith(".wav") && !audio_file.endsWith(".mp3")) {
         continue;
       }
       files.push(audio_file);
@@ -131,7 +139,6 @@ class PipelinesController {
 
 
   public static async refreshPipelines(req: Request, res: Response): Promise<void> {
-    // Get all audio files in the share directory
     if (SHARE_DIR === undefined) {
       throw new Error("SHARE_DIR is not defined");
     }
@@ -139,7 +146,7 @@ class PipelinesController {
     const new_audio_files = fs.readdirSync(NEW_AUDIO_DIR);
     const new_pipelines: audio_results[] = [];
     for (const audio_file of new_audio_files) {
-      if (!audio_file.endsWith(".wav")) {
+      if (!audio_file.endsWith(".wav") && !audio_file.endsWith(".mp3")) {
         continue;
       }
 
@@ -207,6 +214,7 @@ class PipelinesController {
         data: {
           audio_path: audio_path,
           flow_run_id: flowRun.id,
+          date_added: new Date(),
         },
       });
 

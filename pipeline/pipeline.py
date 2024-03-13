@@ -37,6 +37,13 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
     if not os.path.exists(audio_path):
         raise ValueError(f"Audio file {audio_path} does not exist.")
 
+    # 0. convert mp3 to wav
+    if audio_path.endswith('.mp3'):
+        print("Converting mp3 to wav")
+        os.system(f"ffmpeg -i {audio_path} {audio_path.replace('.mp3', '.wav')}")
+        audio_path = audio_path.replace('.mp3', '.wav')
+
+
     # # 1. Run diarization on each segment
     audio_pathname = os.path.basename(audio_path).split('.')[0]
     output_folder = f"{DATA_DIR}/{audio_pathname}_results"
