@@ -36,6 +36,8 @@ services:
   prefect:
     image: david/prefect:latest
     container_name: prefect
+    depends_on:
+      - postgres
     build:
       context: ./pipeline
       dockerfile: Dockerfile
@@ -52,6 +54,8 @@ services:
 
   agent:
     image: david/prefect:latest
+    depends_on:
+      - prefect
     env_file:
       - .env.compose
     entrypoint: ['python3', '/app/pipeline/pipeline.py']

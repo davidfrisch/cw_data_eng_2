@@ -5,13 +5,13 @@ import json
 from dotenv import load_dotenv
 load_dotenv('../.env')
 import os
-from prefect import flow, task
+from prefect import task
 import asyncio
 from typing import List
 from cut_audio import cut_audio
 from pyannote.audio import Pipeline
 
-@task(log_prints=True)
+
 def child_diarization(input_audio, output_file):
   diarization_pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.0",
@@ -49,7 +49,6 @@ def child_diarization(input_audio, output_file):
     f.write(json.dumps(results, indent=2))
 
 
-@task(log_prints=True)  
 def assemble_diarization_results(output_files):
   speakers = {}
   output = {'transcript': ''}
@@ -77,7 +76,7 @@ def assemble_diarization_results(output_files):
   return merge_path
     
  
-@flow(log_prints=True)
+@task(log_prints=True)
 def diarization(audio_file: str, output_folder: str, split_duration: int= 5):
 
   audio_splitted_filenames = cut_audio(audio_file, output_folder, split_duration)

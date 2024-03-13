@@ -50,10 +50,31 @@ class PipelinesController {
     }
 
     const flowRunInfo = await prefectClient.getFlowRunInfo(pipeline.flow_run_id);
+    const emotions = await prisma.emotions_scores.findMany({ where: { flow_run_id: id } });
+    const emotionsPerSpeaker = emotions ? emotions.reduce((acc, emotion: any) => {
+      if (!acc[emotion['speaker_id']]) {
+        acc[emotion['speaker_id']] = [];
+      }
+      acc[emotion['speaker_id']].push(emotion);
+      return acc;
+    }
+      , {} as any) : {};
+
+    const speakers = await prisma.speakers.findMany({ where: { flow_run_id: id } });
+    const conversation_rate = speakers ? speakers.reduce((acc, speaker) => {
+      acc.push({ speaker_id: speaker['speaker_id'], conversation_rate: speaker['conversation_rate'] });
+      return acc;
+    }, [] as any) : {};
+
+
     const pipelineInfo = {
       'status': flowRunInfo['state_type'],
+      emotions: emotionsPerSpeaker,
+      conversation_rate,
       ...pipeline,
     };
+
+
 
     res.status(200).json(pipelineInfo);
   }
@@ -94,6 +115,21 @@ class PipelinesController {
     res.status(200).sendFile(pipeline.audio_path);
   }
 
+
+  public static async pipelinesWaitingForRefresh(req: Request, res: Response): Promise<void> {
+    const new_audio_files = fs.readdirSync(NEW_AUDIO_DIR);
+    const files: string[] = [];
+    for (const audio_file of new_audio_files) {
+      if (!audio_file.endsWith(".wav")) {
+        continue;
+      }
+      files.push(audio_file);
+    }
+
+    res.status(200).json(files);
+  }
+
+
   public static async refreshPipelines(req: Request, res: Response): Promise<void> {
     // Get all audio files in the share directory
     if (SHARE_DIR === undefined) {
@@ -114,10 +150,16 @@ class PipelinesController {
 
       try {
         const pipeline = await PipelinesController.start_pipeline(newPath);
+        if (!pipeline) {
+          throw new Error("Failed to start pipeline");
+        }
         new_pipelines.push(pipeline);
       } catch (error) {
         console.error("Failed to start pipeline for audio: ", audio_file);
         console.error(error);
+        fs.renameSync(newPath, oldPath);
+        res.status(500).send("Failed to start pipeline for audio: " + audio_file);
+        return;
       }
     }
 
@@ -138,27 +180,43 @@ class PipelinesController {
       throw new Error("Audio file not found");
     }
 
-    const deploymentId = await prefectClient.getDeploymentIdByName(pipeline_name);
     const parameters = {
       audio_path,
     };
 
-    const flowRun = await prefectClient.createFlowRun(deploymentId, parameters);
-
-    if (!flowRun) {
-      console.error("Failed to create flow run");
-      throw new Error("Failed to create flow run");
+    let deploymentId: string | null = null;
+    try {
+      deploymentId = await prefectClient.getDeploymentIdByName(pipeline_name);
+    } catch (error) {
+      console.error("Failed to get deployment id");
+      console.error(error);
     }
-    const pipeline = await prisma.audio_results.create({
-      data: {
-        audio_path: audio_path,
-        flow_run_id: flowRun.id,
-      },
-    });
 
-    return pipeline;
+    try {
+      if (!deploymentId) {
+        console.error("Failed to get deployment id");
+        throw new Error("Failed to get deployment id");
+      }
+      const flowRun = await prefectClient.createFlowRun(deploymentId, parameters);
+
+      if (!flowRun) {
+        console.error("Failed to create flow run");
+        throw new Error("Failed to create flow run");
+      }
+      const pipeline = await prisma.audio_results.create({
+        data: {
+          audio_path: audio_path,
+          flow_run_id: flowRun.id,
+        },
+      });
+
+      return pipeline;
+    } catch (error) {
+      console.error("Failed to start pipeline");
+      console.error(error);
+      throw new Error("Failed to start pipeline");
+    }
   }
-
 }
 
 export default PipelinesController;
