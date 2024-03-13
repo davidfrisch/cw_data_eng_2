@@ -47,7 +47,7 @@ services:
         constraints:
           - node.role == manager
     volumes:
-      # - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
       - ./pipeline:/app/pipeline
 
   agent:
@@ -66,24 +66,24 @@ services:
         limits:
           memory: 3gb
     volumes:
-      # - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
       - ./pipeline:/app/pipeline
       - ./sample_data:/app/sample_data
 
 
-  # filebrowser:
-  #   image: filebrowser/filebrowser
-  #   container_name: filebrowser
-  #   restart: always
-  #   volumes:
-  #     # - /mnt/beegfs/prefect_data:/srv
-  #     - ./filebrowser/filebrowser.json:/.filebrowser.json 
-  #     # - ./filebrowser/filebrowser.json:/etc/config.json
-  #     # - ./filebrowser/filebrowser.db:/database.db
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - node.role == manager
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    restart: always
+    volumes:
+      - /mnt/beegfs/prefect_data:/srv
+      - ./filebrowser/filebrowser.json:/.filebrowser.json 
+      # - ./filebrowser/filebrowser.json:/etc/config.json
+      # - ./filebrowser/filebrowser.db:/database.db
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 
 volumes:
   db:

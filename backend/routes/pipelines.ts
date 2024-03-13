@@ -21,7 +21,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 pipelinesRouter.get("/", PipelinesController.getPipelines);
+pipelinesRouter.get("/refresh", PipelinesController.refreshPipelines);
 pipelinesRouter.get("/:id", PipelinesController.getPipeline);
 pipelinesRouter.get("/:id/audio", PipelinesController.getPipelineAudio);
-pipelinesRouter.post("/add-file", upload.single("audio"), PipelinesController.addFromPath);
-pipelinesRouter.post("/add-path", PipelinesController.addFromPath);

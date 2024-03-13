@@ -6,8 +6,10 @@ import { HealthRouter } from "./routes/health";
 import { pipelinesRouter } from "./routes/pipelines";
 import { checkDatabaseConnection } from "./middleware/check_health";
 import dotenv from "dotenv";
+import { createPipelineDirectories } from "./utils";
 
 dotenv.config();
+createPipelineDirectories()
 const app = express();
 app.use(cors());
 app.use(helmet());

@@ -3,6 +3,7 @@ import prisma from "../services/prisma_client";
 import prefectClient from "../services/prefect_client";
 import fs from "fs";
 import { audio_results } from "@prisma/client";
+import { NEW_AUDIO_DIR, PIPELINES_AUDIO_DIR, SHARE_DIR } from "../constants";
 
 class PipelinesController {
 
@@ -93,19 +94,48 @@ class PipelinesController {
     res.status(200).sendFile(pipeline.audio_path);
   }
 
-  public static async addFromPath(req: Request, res: Response): Promise<void> {
-    const { audio_path, pipeline_name = "pipeline-voice-analysis" } = req.body;
+  public static async refreshPipelines(req: Request, res: Response): Promise<void> {
+    // Get all audio files in the share directory
+    if (SHARE_DIR === undefined) {
+      throw new Error("SHARE_DIR is not defined");
+    }
+
+    const new_audio_files = fs.readdirSync(NEW_AUDIO_DIR);
+    const new_pipelines: audio_results[] = [];
+    for (const audio_file of new_audio_files) {
+      if (!audio_file.endsWith(".wav")) {
+        continue;
+      }
+
+      const oldPath = `${NEW_AUDIO_DIR}/${audio_file}`;
+      const timestamp = new Date().getTime();
+      const newPath = `${PIPELINES_AUDIO_DIR}/${timestamp}-${audio_file}`;
+      fs.renameSync(oldPath, newPath);
+
+      try {
+        const pipeline = await PipelinesController.start_pipeline(newPath);
+        new_pipelines.push(pipeline);
+      } catch (error) {
+        console.error("Failed to start pipeline for audio: ", audio_file);
+        console.error(error);
+      }
+    }
+
+    res.status(200).send("Pipelines refreshed, new pipelines: " + new_pipelines.length);
+  }
+
+
+  private static async start_pipeline(audio_path: string): Promise<audio_results> {
+    const pipeline_name = "pipeline-voice-analysis"
 
     console.log("Here is the audio path: ", audio_path);
 
     if (!audio_path) {
-      res.status(400).send("Audio file is required");
-      return;
+      throw new Error("Audio file is required");
     }
 
     if (!fs.existsSync(audio_path)) {
-      res.status(404).send("Audio file not found");
-      return;
+      throw new Error("Audio file not found");
     }
 
     const deploymentId = await prefectClient.getDeploymentIdByName(pipeline_name);
@@ -117,8 +147,7 @@ class PipelinesController {
 
     if (!flowRun) {
       console.error("Failed to create flow run");
-      res.status(500).send("Failed to create flow run");
-      return;
+      throw new Error("Failed to create flow run");
     }
     const pipeline = await prisma.audio_results.create({
       data: {
@@ -127,7 +156,7 @@ class PipelinesController {
       },
     });
 
-    res.status(201).json(pipeline);
+    return pipeline;
   }
 
 }
