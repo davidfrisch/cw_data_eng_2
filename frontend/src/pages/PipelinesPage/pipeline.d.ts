@@ -5,4 +5,5 @@ export interface Pipeline {
   date_added: string;
   date_updated: string;
   vm_worker_id: string;
+  conversation_rate: { speaker_id: string; conversation_rate: number }[];
 }

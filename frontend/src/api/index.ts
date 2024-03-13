@@ -30,7 +30,15 @@ const pipelines = {
       responseType: "blob",
     });
     return response.data;
-  }
+  },
+
+  async getWaitingForRefresh() {
+    return await api.get("/pipelines/waiting");
+  },
+
+  async startProcessing() {
+    return await api.post("/pipelines/start-processing");
+  },
 
 }
 
