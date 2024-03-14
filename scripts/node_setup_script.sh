@@ -4,7 +4,7 @@ set -e
 DIRECTORY=$(dirname $0)
 
 # Path in VMs
-SHARE_DIR="/mnt/beegfs/prefect_data/pipeline_audios"
+SHARE_DIR="/mnt/beegfs/prefect_data/pipelines_audios"
 # DOCKER_SHARE_DIR="/data"
 
 # For local
@@ -73,6 +73,7 @@ echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env
 echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_UI_URL=$PREFECT_UI_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_API_URL=$PREFECT_API_URL" >> $DIRECTORY/../pipeline/.env
+echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
 
 # For backend
@@ -91,5 +92,6 @@ echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../.env.compose
 echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../.env.compose
 echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../.env.compose
 echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/../.env.compose
+echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../.env.compose
 echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../.env.compose
 echo "Finished setting up local environment variables."

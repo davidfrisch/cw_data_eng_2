@@ -2,7 +2,7 @@
 import os
 from dotenv import load_dotenv
 load_dotenv('.env')
-DATA_DIR = "/mnt/beegfs/prefect_data/pipeline_audios"
+DATA_DIR = "/mnt/beegfs/prefect_data/pipelines_audios"
 PORT = 5001
 HOSTNAME = "0.0.0.0"
 if not os.getenv("DATABASE_URL"):
