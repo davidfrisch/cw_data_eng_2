@@ -4,7 +4,10 @@ import { Button, Card, Container, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Pipeline } from "./pipeline";
 
-
+const failedStatus = ["failed", "crashed", "timedout"]
+const completedStatus = ["completed"]
+const runningStatus = ["running", "retrying"]
+const scheduledStatus = ["scheduled", "late", "resuming", "awaitingretry", "pending", "paused"]
 
 export default function PipelinesPage() {
 
@@ -48,15 +51,14 @@ export default function PipelinesPage() {
     navigate(`/pipelines/${id}`);
   }
 
-  const handleFilter = (status: string) => {
-    setCurrentStatus(status);
-    if (status === "all") {
+  const handleFilter = (status: string[]) => {
+    setCurrentStatus(status[0]);
+    if (status[0] === "all") {
       setFilteredPipelines(pipelines);
       return;
     }
 
-    const filteredPipelines = pipelines.filter((pipeline: Pipeline) => pipeline?.status && pipeline?.status?.toLowerCase() === status.toLowerCase());
-    console.log(filteredPipelines);
+    const filteredPipelines = pipelines.filter((pipeline: Pipeline) => pipeline?.status && status.includes(pipeline.status.toLowerCase()));
     setFilteredPipelines(filteredPipelines);
   }
 
@@ -80,10 +82,11 @@ export default function PipelinesPage() {
         </Button>
       </div>}
       <Container sx={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter("all")}>ALL</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter("running")}>RUNNING</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter("completed")}>COMPLETED</Button>
-        <Button variant="contained" color={currentStatus === "failed" ? "secondary" : "primary"} onClick={() => handleFilter("failed")}>FAILED</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter(["all"])}>ALL</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "scheduled" ? "secondary" : "primary"} onClick={() => handleFilter(scheduledStatus)}>SCHEDULED</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter(runningStatus)}>RUNNING</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter(completedStatus)}>COMPLETED</Button>
+        <Button variant="contained" color={currentStatus === "failed" ? "secondary" : "primary"} onClick={() => handleFilter(failedStatus)}>FAILED</Button>
       </Container>
       {isLoading && <p>Loading...</p>}
 

@@ -47,7 +47,7 @@ const Navbar: FC = () => {
   }
 
   const pages = [
-    { name: "home", label: "Pipelines" },
+    { name: "/", label: "Pipelines" },
   ];
 
   return (

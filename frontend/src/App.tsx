@@ -23,7 +23,7 @@ function App() {
           <CssBaseline />
           <Navbar />
           <Routes>
-            <Route path="/home" element={<PipelinesPage />} />
+            <Route path="/" element={<PipelinesPage />} />
             <Route path="/pipelines" element={<PipelinesPage />} />
             <Route path="/pipelines/:id" element={<PipelineItem />} />
             <Route path="/add" element={<AddPipelinePage />} />
