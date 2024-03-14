@@ -13,6 +13,7 @@ export default function PipelinesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [numWaitingForRefresh, setNumWaitingForRefresh] = useState(0);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState("all" as string);
   const navigate = useNavigate();
 
   async function getPipelines() {
@@ -48,6 +49,12 @@ export default function PipelinesPage() {
   }
 
   const handleFilter = (status: string) => {
+    setCurrentStatus(status);
+    if (status === "all") {
+      setFilteredPipelines(pipelines);
+      return;
+    }
+
     const filteredPipelines = pipelines.filter((pipeline: Pipeline) => pipeline?.status && pipeline?.status?.toLowerCase() === status.toLowerCase());
     console.log(filteredPipelines);
     setFilteredPipelines(filteredPipelines);
@@ -73,23 +80,25 @@ export default function PipelinesPage() {
         </Button>
       </div>}
       <Container sx={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color="primary" onClick={() => setFilteredPipelines(pipelines)}>ALL</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color="primary" onClick={() => handleFilter("running")}>RUNNING</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color="primary" onClick={() => handleFilter("completed")}>COMPLETED</Button>
-        <Button variant="contained" color="primary" onClick={() => handleFilter("failed")}>FAILED</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter("all")}>ALL</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter("running")}>RUNNING</Button>
+        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter("completed")}>COMPLETED</Button>
+        <Button variant="contained" color={currentStatus === "failed" ? "secondary" : "primary"} onClick={() => handleFilter("failed")}>FAILED</Button>
       </Container>
       {isLoading && <p>Loading...</p>}
 
       {!isLoading && filteredPipelines.length === 0 && <div>
         <h2>No Pipelines Found</h2>
 
-
-        <p>Create a new pipeline by clicking the button "Add file" and drag and drop the file</p>
+        {currentStatus === "running" && <p>There are no running pipelines</p>}
+        {currentStatus === "completed" && <p>There are no completed pipelines</p>}
+        {currentStatus === "failed" && <p>There are no failed pipelines</p>}
+        {currentStatus === "all" && <p>Create a new pipeline by clicking the button "Add file" and drag and drop the file</p>}
       </div>}
 
       <div style={{ display: "flex", flexWrap: "wrap", overflowY: "auto", height: "calc(100vh - 150px)" }}>
         {filteredPipelines.map((pipeline: Pipeline) => (
-          <Card elevation={3} sx={{ padding: "20px", margin: "20px", width: "calc(50% - 40px)" }}>
+          <Card key={pipeline.flow_run_id} elevation={3} sx={{ padding: "20px", margin: "20px", width: "calc(50% - 40px)", height: "330px" }}>
             <h2>Pipeline ID: {pipeline.flow_run_id}</h2>
             <p>Status: {pipeline.status}</p>
             <p>Date Added: {pipeline.date_added ? new Date(pipeline.date_added).toLocaleString() : ""}</p>

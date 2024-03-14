@@ -1,4 +1,4 @@
-import { CardMedia, Paper } from '@mui/material'
+import { Card, CardMedia, Paper } from '@mui/material'
 import { useEffect, useState } from 'react'
 import api from '../../api';
 import { Pipeline } from './pipeline';
@@ -53,11 +53,28 @@ export default function PipelineItem() {
     window.open(`${PREFECT_UI_URL}/flow-runs/flow-run/${pipeline?.flow_run_id}`, "_blank");
   }
 
+  const sortEmotions = (emotions: any) => {
+    const sortedEmotionsKeys = Object.keys(emotions).sort((a, b) => emotions[b].score - emotions[a].score);
+    return sortedEmotionsKeys.map((key) => `${emotions[key].name}: ${(100 * emotions[key].score).toFixed(2)}%`).slice(0, 3);
+  }
+
   return (
     <div>
       {!pipeline?.flow_run_id ? <p>No pipeline found</p> :
         <Paper elevation={3} style={{ padding: "20px", margin: "20px" }}>
-          <h1>Pipeline</h1>
+          <button onClick={handleVisitPrefectPage} disabled={!pipeline.status}>Visit Prefect UI</button>
+          <h1>Pipeline:</h1>
+          <h3>{pipeline.audio_path.split("/").slice(-1)[0]}</h3>
+          {!isLoadingAudio && pipelineAudioFile ? (<CardMedia
+            component="audio"
+            controls
+            src={pipelineAudioFile}
+          />) :
+            (<div>
+              {isLoadingAudio ? <p>Loading audio...</p> : <p>No audio found</p>}
+            </div>)
+          }
+
           <p>Flow Run ID: {pipeline.flow_run_id}</p>
           <p>Status: {pipeline.status || "No status found"}</p>
           <p>Date Added: {pipeline.date_added ? new Date(pipeline.date_added).toLocaleString() : ""}</p>
@@ -71,23 +88,22 @@ export default function PipelineItem() {
           </div>
           <div>
             <h3> Top 3 emotions per speaker </h3>
-            {pipeline?.emotions ? Object.keys(emotions).map((speaker_id) => (
-              <p key={speaker_id}>{speaker_id}: {pipeline?.emotions[speaker_id].slice(0, 3).join(", ")}</p>
+            {pipeline?.emotions ? Object.keys(pipeline.emotions).map((speaker_id) => (
+              <Card elevation={3} style={{ padding: "20px", margin: "20px", border: "#fff solid 2px" }} key={speaker_id}>
+
+                <div key={speaker_id}>
+                  {speaker_id}:
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    {sortEmotions(pipeline.emotions[speaker_id]).map((emotion) => (
+                      <p key={emotion}>{emotion}</p>
+                    ))}
+                  </div>
+
+                </div>
+              </Card>
             )) : "No emotions found"}
           </div>
 
-
-          {!isLoadingAudio && pipelineAudioFile ? (<CardMedia
-            component="audio"
-            controls
-            src={pipelineAudioFile}
-          />) :
-            (<div>
-              {isLoadingAudio ? <p>Loading audio...</p> : <p>No audio found</p>}
-            </div>)
-          }
-
-          <button onClick={handleVisitPrefectPage} disabled={!pipeline.status}>Visit Prefect UI</button>
 
 
         </Paper>
