@@ -72,6 +72,21 @@ export default function PipelinesPage() {
     }
   }
 
+  const handleDownloadPipelines = async () => {
+    try {
+      const response = await api.pipelines.download(null, currentStatus)
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      const timestamp = new Date().toISOString().replace(/:/g, "-");
+      link.setAttribute("download", `pipelines-${currentStatus}-${timestamp}.json`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   return (
     <Container>
@@ -81,12 +96,19 @@ export default function PipelinesPage() {
           Start processing ({numWaitingForRefresh}) files
         </Button>
       </div>}
-      <Container sx={{ display: "flex", justifyContent: "flex-start" }}>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter(["all"])}>ALL</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "scheduled" ? "secondary" : "primary"} onClick={() => handleFilter(scheduledStatus)}>SCHEDULED</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter(runningStatus)}>RUNNING</Button>
-        <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter(completedStatus)}>COMPLETED</Button>
-        <Button variant="contained" color={currentStatus === "failed" ? "secondary" : "primary"} onClick={() => handleFilter(failedStatus)}>FAILED</Button>
+      <Container>
+        <Container sx={{ display: "flex", justifyContent: "flex-start" }}>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter(["all"])}>ALL</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "scheduled" ? "secondary" : "primary"} onClick={() => handleFilter(scheduledStatus)}>SCHEDULED</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter(runningStatus)}>RUNNING</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter(completedStatus)}>COMPLETED</Button>
+          <Button variant="contained" color={currentStatus === "failed" ? "secondary" : "primary"} onClick={() => handleFilter(failedStatus)}>FAILED</Button>
+        </Container>
+        <Container sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button variant="contained" color="primary" onClick={handleDownloadPipelines}>
+            Download Pipelines
+          </Button>
+        </Container>
       </Container>
       {isLoading && <p>Loading...</p>}
 

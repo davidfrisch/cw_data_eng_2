@@ -41,6 +41,13 @@ const pipelines = {
     return await api.post("/pipelines/start-processing");
   },
 
+  async download(ids: string[] | null = null, status: string = "") {
+    const idsQuery = ids ? `ids=${ids.join(",")}` : "";
+    const statusQuery = status !== "all" ? `status=${status}` : "";
+    const query = [idsQuery, statusQuery].filter((x) => x).join("&");
+    return await api.get(`/pipelines/download?${query}`, { responseType: "blob" });
+  }
+
 }
 
 
