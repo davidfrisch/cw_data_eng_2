@@ -9,7 +9,8 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - prefect
+      - filebrowser
+      - backend
 
   postgres:
     image: david712/postgres:latest
@@ -28,10 +29,8 @@ services:
           - node.role == manager
     ports:
       - "5432:5432"
-    volumes: 
+    volumes:
       - db:/var/lib/postgresql/data
-
-
 
   prefect:
     image: david712/prefect:latest
@@ -41,7 +40,7 @@ services:
     build:
       context: ./pipeline
       dockerfile: Dockerfile
-    entrypoint: ['prefect', 'server', 'start', '--host', '0.0.0.0']
+    entrypoint: [ 'prefect', 'server', 'start', '--host', '0.0.0.0' ]
     env_file:
       - .env.compose
     deploy:
@@ -58,7 +57,7 @@ services:
       - prefect
     env_file:
       - .env.compose
-    entrypoint: ['python3', '/app/pipeline/pipeline.py']
+    entrypoint: [ 'python3', '/app/pipeline/pipeline.py' ]
     deploy:
       endpoint_mode: vip
       replicas: 1
@@ -74,16 +73,32 @@ services:
       - ./pipeline:/app/pipeline
       - ./sample_data:/app/sample_data
 
-
   filebrowser:
     image: filebrowser/filebrowser
     container_name: filebrowser
     restart: always
     volumes:
       - /mnt/beegfs/prefect_data:/srv
-      - ./filebrowser/filebrowser.json:/.filebrowser.json 
+      - ./filebrowser/filebrowser.json:/.filebrowser.json
       # - ./filebrowser/filebrowser.json:/etc/config.json
       # - ./filebrowser/filebrowser.db:/database.db
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  backend:
+    image: david712/backend:latest
+    container_name: backend
+    depends_on:
+      - postgres
+    volumes:
+      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env.compose
     deploy:
       placement:
         constraints:

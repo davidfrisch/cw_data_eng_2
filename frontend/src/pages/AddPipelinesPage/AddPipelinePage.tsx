@@ -1,5 +1,5 @@
 import { FileUploader } from "react-drag-drop-files"
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import api from "../../api";
 import { PREFECT_UI_URL } from "../../constants";
 import { CircularProgress } from "@mui/material";

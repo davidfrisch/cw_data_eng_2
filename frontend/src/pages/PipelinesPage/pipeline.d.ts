@@ -1,4 +1,5 @@
 export interface Pipeline {
+  [x: string]: any;
   flow_run_id: string;
   status: string;
   audio_path: string;
