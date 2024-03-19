@@ -1,6 +1,6 @@
-# WARNING build before david712/prefect:2.14.12-python3.11 with the following command:
-# docker build --pull --rm -f "pipeline/Dockerfile.pre" -t david712/prefect:2.14.12-python3.11 "pipeline"
-FROM david712/prefect:2.14.12-python3.11
+# docker build --pull --rm -f "pipeline/Dockerfile.pre" -t david712/prefect:2.14.12-python3.11 "pipeline" 
+# The reason why we do a pre-build is because we want to update prefect image faster.
+FROM prefecthq/prefect:2.14.12-python3.11
 
 RUN apt-get update && apt-get install -y
 RUN apt-get install -y --no-install-recommends ffmpeg
