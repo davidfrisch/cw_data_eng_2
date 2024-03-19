@@ -225,6 +225,76 @@ class PipelinesController {
       throw new Error("Failed to start pipeline");
     }
   }
+
+  public static async downloadPipelines(req: Request, res: Response): Promise<void> {
+    const { ids, status } = req.query;
+
+
+
+    // if id not provided then downaload all the pipelines
+
+    const where: Prisma.audio_resultsWhereInput = {};
+    if (ids) {
+      where.flow_run_id = { in: ids.toString().split(",") };
+    }
+
+    const pipelines = await prisma.audio_results.findMany({ where });
+
+    if (!pipelines) {
+      res.status(404).send("Pipelines not found");
+    }
+
+    const pipelinesInfo = pipelines.map(async (pipeline: audio_results) => {
+      const flowRunInfo = await prefectClient.getFlowRunInfo(pipeline.flow_run_id);
+      const { audio_path, flow_run_id, date_added, date_updated, vm_worker_id } = pipeline;
+      const currentStatusPipeline = flowRunInfo['state_type']?.toLowerCase();
+
+      if (status && status?.toString().toLowerCase() !== currentStatusPipeline) {
+        return null;
+      }
+
+
+      let conversationRate: any = null;
+      if (currentStatusPipeline === "completed") {
+        const avgConversationRate = await prisma.speakers.groupBy({ by: ['flow_run_id'], _avg: { conversation_rate: true } });
+        conversationRate = avgConversationRate.find((avg: any) => avg.flow_run_id === flow_run_id)?._avg.conversation_rate
+        conversationRate = isNaN(conversationRate) ? null : Math.round(conversationRate);
+      }
+      return {
+        'status': flowRunInfo['state_type'],
+        flow_run_id,
+        audio_path,
+        date_added,
+        date_updated,
+        vm_worker_id,
+        conversationRate
+      };
+    }
+    );
+
+    let allPipelines = await Promise.all(pipelinesInfo);
+    allPipelines = allPipelines.filter((pipeline: any) => pipeline !== null);
+
+    // Write to a file and send the file to the user
+    const timestamp = new Date().getTime();
+    const filename = `pipelines-${timestamp}.json`;
+    const filepath = `${SHARE_DIR}/${filename}`;
+    try {
+      fs.writeFileSync(filepath, JSON.stringify(allPipelines, null, 2));
+
+      res.status(200).download(filepath, filename, () => {
+        fs.unlinkSync(filepath as string);
+      })
+      return;
+    } catch (error) {
+      console.error("Failed to write pipelines to file");
+      console.error(error);
+      res.status(500).send("Failed to write pipelines to file");
+      return;
+    }
+
+
+  }
 }
 
 export default PipelinesController;

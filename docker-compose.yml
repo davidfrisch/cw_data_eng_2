@@ -12,7 +12,7 @@ services:
       - prefect
 
   postgres:
-    image: 10.0.8.191:5000/postgres
+    image: david712/postgres:latest
     container_name: postgres
     build:
       context: ./database
@@ -34,7 +34,7 @@ services:
 
 
   prefect:
-    image: david/prefect:latest
+    image: david712/prefect:latest
     container_name: prefect
     depends_on:
       - postgres
@@ -53,7 +53,7 @@ services:
       - ./pipeline:/app/pipeline
 
   agent:
-    image: david/prefect:latest
+    image: david712/prefect:latest
     depends_on:
       - prefect
     env_file:

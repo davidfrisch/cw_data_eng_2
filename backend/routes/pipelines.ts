@@ -23,5 +23,6 @@ const upload = multer({ storage });
 pipelinesRouter.get("/", PipelinesController.getPipelines);
 pipelinesRouter.post("/start-processing", PipelinesController.refreshPipelines);
 pipelinesRouter.get("/waiting", PipelinesController.pipelinesWaitingForRefresh);
+pipelinesRouter.get("/download", PipelinesController.downloadPipelines);
 pipelinesRouter.get("/:id", PipelinesController.getPipeline);
 pipelinesRouter.get("/:id/audio", PipelinesController.getPipelineAudio);
