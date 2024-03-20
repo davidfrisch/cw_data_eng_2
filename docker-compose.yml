@@ -74,8 +74,6 @@ services:
       - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
       - ./pipeline:/app/pipeline
       - ./sample_data:/app/sample_data
-    depends_on:
-      - prefect
 
   filebrowser:
     image: filebrowser/filebrowser

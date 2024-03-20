@@ -8,28 +8,16 @@
     state: directory
     recurse: yes
 
-# TODO: Put it back when the script is ready
-# - name: Update git repo
-#   shell:  |
-#     cd {{ repo_dir }} && \
-#     git pull https://{{ git_token }}@github.com/davidfrisch/cw_data_eng_2
+- name: Update git repo
+  shell:  |
+    cd {{ repo_dir }} && \
+    git pull https://{{ git_token }}@github.com/davidfrisch/cw_data_eng_2
 
-
-- name: Install nslookup with yum
-  yum:
-    name: bind-utils
-    state: present
-
-# TODO: Put it back when the script is ready
-# - name: Update env vars 
-#   shell: |
-#     cd {{ repo_dir }} && ./scripts/setup_local_env.sh --hostname {{ groups['client'][0] }} --db-user {{ database_user }} --db-pass {{ database_pass }} 
-
-# TODO Put it back when requirements.txt is ready
-# - name: install requirements
-#   shell: |
-#     cd {{ repo_dir }} && \
-#     source venv/bin/activate && \
-#     pip install pip --upgrade && \
-#     cd {{ repo_dir }} && \
-#     TMPDIR=/mnt/data pip install . --no-cache --cache-dir=/mnt/data/pip_cache --no-cache
+- name: Run node_setup_script.sh with arguments
+  command: " {{ repo_dir }}/scripts/node_setup_script.sh \
+        -h {{ groups['client'][0] }} \
+        -t ${{ hf_token }} \
+        -db audio_results \
+        -du ${{ pg_user }} \
+        -dp ${{ pg_password }} "
+        
