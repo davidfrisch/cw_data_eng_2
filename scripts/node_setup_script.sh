@@ -63,10 +63,8 @@ if [[ -z "$IP_ADDRESS" ]]; then
 fi
 
 DOCKER_VITE_BACKEND_URL="http://backend:3001/v1"
-DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
 DOCKER_PREFECT_URL=http://$HOSTNAME:4201
-DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
-PREFECT_DATABASE_URL="postgresql+asyncpg://$DATABASE_USER:$DATABASE_PASS@postgres:5432/prefect"
+DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$HOSTNAME:5432/$DATABASE_NAME"
 
 # For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env
@@ -82,16 +80,15 @@ echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env.compose
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../pipeline/.env.compose
-echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env.compose
-echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
+echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
 echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env
 
 # For backend with .env.compose
-echo "DATABASE_URL=$DOCKER_DATABASE_URL" > $DIRECTORY/../backend/.env.compose
+echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env.compose
 echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env.compose
 
 
