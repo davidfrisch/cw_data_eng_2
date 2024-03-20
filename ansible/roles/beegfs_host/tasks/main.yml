@@ -1,0 +1,3 @@
+
+- name: Include beegfs host
+  include_tasks: tasks/2_beegfs-host.yml

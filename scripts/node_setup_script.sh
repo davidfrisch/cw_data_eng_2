@@ -106,6 +106,4 @@ echo "VITE_PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../frontend/.env.st
 echo "VITE_FRONTEND_URL=http://$HOSTNAME" >> $DIRECTORY/../frontend/.env.staging
 
 
-
-
 echo "Finished setting up local environment variables."

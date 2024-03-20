@@ -1,3 +1,9 @@
+
+- name: install git
+  package:
+    name: git
+    state: present
+
 - name: clone git repo
   shell:  |
     cd {{ base_repo_dir }} && \

@@ -1,0 +1,32 @@
+
+
+- name: Install BeeGFS packages
+  include_tasks: tasks/1_beegfs-packages.yml
+
+- name: Has data in /mnt/data/beegfs_data/target
+  stat:
+    path: /mnt/data/beegfs_data/target
+  register: beegfs_data_target
+
+- name: Include beegfs storage
+  include_tasks: tasks/3_beegfs-storage.yml
+  when: not beegfs_data_target.stat.exists
+
+- name: Echo beegfs data target
+  ansible.builtin.debug:
+    msg: "BeeGFS data target already exists in /mnt/data/beegfs_data/target"
+  when: beegfs_data_target.stat.exists
+
+- name: Has data in /mnt/beegfs
+  stat:
+    path: /mnt/beegfs
+  register: beegfs_mount
+
+- name: Include beegfs common
+  include_tasks: tasks/4_beegfs-common.yml
+  when: not beegfs_mount.stat.exists
+
+- name: Echo beegfs mount
+  ansible.builtin.debug:
+    msg: "BeeGFS mount already exists in /mnt/beegfs"
+  when: beegfs_mount.stat.exists

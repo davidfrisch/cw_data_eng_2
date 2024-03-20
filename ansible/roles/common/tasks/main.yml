@@ -38,4 +38,17 @@
   include_tasks: tasks/install_repo.yml
   when: not repo_installation.stat.exists  
 
-- include_tasks: tasks/update_repo.yml
+- name: Update Repo
+  include_tasks: tasks/update_repo.yml
+  when: repo_installation.stat.exists
+
+- name: Run node_setup_script.sh with arguments
+  command: " {{ repo_dir }}/scripts/node_setup_script.sh \
+        -h {{ groups['client'][0] }} \
+        -t ${{ hf_token }} \
+        -db audio_results \
+        -du ${{ pg_user }} \
+        -dp ${{ pg_password }} "
+        
+
+

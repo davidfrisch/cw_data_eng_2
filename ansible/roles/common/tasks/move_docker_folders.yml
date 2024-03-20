@@ -10,8 +10,7 @@
   ansible.builtin.copy:
     content: |
       {
-        "data-root": "/mnt/data/docker",
-        "insecure-registries": ["{{ groups['client'][0] }}:5000"]
+        "data-root": "/mnt/data/docker"
       }
     dest: /etc/docker/daemon.json
 

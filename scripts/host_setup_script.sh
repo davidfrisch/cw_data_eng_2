@@ -5,10 +5,16 @@ DIRECTORY=$(dirname $0)
 
 SECRET_KEY_FILE=""
 GIT_TOKEN=""
+HF_TOKEN=""
+PG_USER=""
+PG_PASSWORD=""
 
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
+        -du|--db-user) DATABASE_USER="$2"; shift ;;
+        -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
+        -hf|--hf-token) HF_TOKEN="$2"; shift ;;
         -s|--secret-key-file) SECRET_KEY_FILE="$2"; shift ;;
         -t|--git-token) GIT_TOKEN="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
@@ -29,6 +35,21 @@ fi
 
 if [[ -z "$GIT_TOKEN" ]]; then
     echo "ERROR: git token not specified!, -t|--git-token"
+    exit 1
+fi
+
+if [[ -z "$HF_TOKEN" ]]; then
+    echo "ERROR: huggingface token not specified!, -hf|--hf-token"
+    exit 1
+fi
+
+if [[ -z "$DATABASE_USER" ]]; then
+    echo "ERROR: database user not specified!, -du|--db-user"
+    exit 1
+fi
+
+if [[ -z "$DATABASE_PASS" ]]; then
+    echo "ERROR: database password not specified!, -dp|--db-pass"
     exit 1
 fi
 
@@ -56,6 +77,9 @@ ssh_private_key: $SECRET_KEY_FILE
 git_token: $GIT_TOKEN
 user: ec2-user
 group: ec2-user
+hf_token: $HF_TOKEN
+pg_user: $DATABASE_USER
+pg_password: $DATABASE_PASS
 " > $DIRECTORY/../ansible/custom_vars.yml
 
 

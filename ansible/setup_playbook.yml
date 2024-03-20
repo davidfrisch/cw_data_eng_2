@@ -6,11 +6,12 @@
     - include_vars: vars.yml
     - include_vars: custom_vars.yml
 
+    - name: Include beegfs role
+      import_role:
+        name: beegfs_common
+
     - name: Include common role
       import_role:
         name: common
 
-    - name: Include beegfs role
-      import_role:
-        name: install_beegfs
 

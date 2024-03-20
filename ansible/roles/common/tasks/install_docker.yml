@@ -50,5 +50,4 @@
       append: true
       groups: docker
       name: ec2-user
-  - name: Log out and back in to apply changes
-    ansible.builtin.shell: "newgrp docker"
+  
