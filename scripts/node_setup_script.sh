@@ -78,13 +78,13 @@ echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
 
 ### Docker with .env.compose or .env.staging
 # For prefect server
-echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../.env.compose
-echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../.env.compose
-echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../.env.compose
-echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../.env.compose
-echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/../.env.compose
-echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../.env.compose
-echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../.env.compose
+echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env.compose
+echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env.compose
+echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../pipeline/.env.compose
+echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../pipeline/.env.compose
+echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
+echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env.compose
+echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
