@@ -76,16 +76,7 @@ echo "PREFECT_API_URL=$PREFECT_API_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
 
-# For backend
-echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
-echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env
-
-# For frontend
-echo "VITE_BACKEND_URL=$VITE_BACKEND_URL" > $DIRECTORY/../frontend/.env
-echo "VITE_PREFECT_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../frontend/.env
-
-
-### Docker with .env.staging
+### Docker with .env.compose or .env.staging
 # For pipeline
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../.env.compose
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../.env.compose
@@ -95,3 +86,24 @@ echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/.
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../.env.compose
 echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../.env.compose
 echo "Finished setting up local environment variables."
+
+# For backend
+echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
+echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env
+
+# For backend with .env.compose
+echo "DATABASE_URL=$DOCKER_DATABASE_URL" > $DIRECTORY/../backend/.env.compose
+echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env.compose
+
+
+# For frontend
+echo "VITE_BACKEND_URL=$VITE_BACKEND_URL" > $DIRECTORY/../frontend/.env
+echo "VITE_PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../frontend/.env
+echo "VITE_FRONTEND_URL=http://localhost:3000" >> $DIRECTORY/../frontend/.env
+
+# For frontend with .env.staging
+echo "VITE_BACKEND_URL=$DOCKER_VITE_BACKEND_URL" > $DIRECTORY/../frontend/.env.staging
+echo "VITE_PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../frontend/.env.staging
+echo "VITE_FRONTEND_URL=http://$HOSTNAME" >> $DIRECTORY/../frontend/.env.staging
+
+
