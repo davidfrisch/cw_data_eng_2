@@ -1,0 +1,19 @@
+- name: Stop Client Playbook
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Docker compose down
+      shell:  cd {{ repo_dir }} && docker compose build
+
+- name: Stop Cluster Playbook
+  hosts: clusters
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Docker compose down
+      shell:  cd {{ repo_dir }} && docker compose down

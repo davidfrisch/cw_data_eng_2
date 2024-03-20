@@ -8,3 +8,4 @@ ansible/custom_vars.yml
 connauthfile
 .env*
 node_modules
+swarm_join_token.txt

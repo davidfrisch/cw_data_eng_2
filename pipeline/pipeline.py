@@ -1,6 +1,5 @@
 """ TMPDIR=/mnt/data pip install -r requirements.txt --no-cache --cache-dir=/mnt/data/pip_cache """
 import os 
-import json
 import sys
 os.environ['HF_HOME'] = '/mnt/data'
 

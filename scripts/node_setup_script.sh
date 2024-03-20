@@ -64,11 +64,11 @@ fi
 
 DOCKER_VITE_BACKEND_URL="http://backend:3001/v1"
 DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
-DOCKER_PREFECT_URL=http://prefect:4200
+DOCKER_PREFECT_URL=http://$HOSTNAME:4201
 DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
 PREFECT_DATABASE_URL="postgresql+asyncpg://$DATABASE_USER:$DATABASE_PASS@postgres:5432/prefect"
 
-# For pipeline
+# For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env
 echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_UI_URL=$PREFECT_UI_URL" >> $DIRECTORY/../pipeline/.env
@@ -77,7 +77,7 @@ echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
 
 ### Docker with .env.compose or .env.staging
-# For pipeline
+# For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../.env.compose
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../.env.compose
 echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../.env.compose
@@ -85,7 +85,6 @@ echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../.env.compose
 echo "PREFECT_API_DATABASE_CONNECTION_URL=$PREFECT_DATABASE_URL" >> $DIRECTORY/../.env.compose
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../.env.compose
 echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../.env.compose
-echo "Finished setting up local environment variables."
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
@@ -107,3 +106,6 @@ echo "VITE_PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../frontend/.env.st
 echo "VITE_FRONTEND_URL=http://$HOSTNAME" >> $DIRECTORY/../frontend/.env.staging
 
 
+
+
+echo "Finished setting up local environment variables."

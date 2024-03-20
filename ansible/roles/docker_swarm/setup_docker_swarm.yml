@@ -1,0 +1,29 @@
+---
+- name: Setup Docker Swarm
+  hosts: client
+  become: true
+
+  tasks:
+      - include_vars: ../vars.yml
+
+      - name: Leave the swarm
+        command: docker swarm leave --force
+        ignore_errors: yes
+
+      - name: Init a new swarm with default parameters
+        command: docker swarm init
+        register: swarm_init
+      
+      - name: Get the join token for the worker nodes
+        command: docker swarm join-token worker
+        register: swarm_join_token
+
+      - name: Save the join token to a file
+        copy:
+          content: "{{ swarm_join_token.stdout_lines[2] | trim }}"
+          dest: "{{ repo_dir }}/swarm_join_token.txt"
+        when: swarm_join_token.stdout is defined
+
+
+      
+            

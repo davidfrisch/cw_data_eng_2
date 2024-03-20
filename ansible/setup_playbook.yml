@@ -1,5 +1,5 @@
 - name: Setup playbook
-  hosts: client
+  hosts: coursemachines
   become: true
 
   tasks:
@@ -9,4 +9,8 @@
     - name: Include common role
       import_role:
         name: common
+
+    - name: Include beegfs role
+      import_role:
+        name: install_beegfs
 

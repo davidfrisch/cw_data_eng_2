@@ -1,0 +1,25 @@
+- name: Start Client Playbook
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Docker compose build
+      shell:  cd {{ repo_dir }} && docker compose build
+
+    - name: Docker compose up
+      shell:  cd {{ repo_dir }} && docker compose up -d
+    
+    - name: You can now access the app 
+      debug: msg="You can now access the app at http://{{ groups['client'][0] }}"
+
+- name: Start Cluster Playbook
+  hosts: clusters
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Docker compose up
+      shell:  cd {{ repo_dir }} && docker compose up agent

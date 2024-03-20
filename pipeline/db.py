@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from models.audio_results import AudioResults
 from models.speakers import Speakers
 from models.emotions import EmotionsScores
-# Replace placeholders with your PostgreSQL credentials
+
 
 def get_engine():
     db_url = DATABASE_URL
