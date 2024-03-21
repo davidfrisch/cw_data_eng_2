@@ -75,6 +75,13 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
     # 5. Clean audio files
     ## move wav file in results folder
     os.system(f"mv {audio_path} {output_folder}")
+    # update audio path in db
+    try:
+        update_audio_results.audio_path = f"{output_folder}/{os.path.basename(audio_path)}"
+        session.add(update_audio_results)
+        session.commit()
+    except Exception as e:
+        print(f"Error updating audio path in db: {e}")
     
     
     session.close()
