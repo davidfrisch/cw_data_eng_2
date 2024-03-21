@@ -9,6 +9,7 @@ HF_TOKEN=""
 PG_USER=""
 PG_PASSWORD=""
 PLATFORM_URL=""
+CLIENT_IP_ADDRESS=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -16,6 +17,7 @@ while [[ "$#" -gt 0 ]]; do
         -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
         -hf|--hf-token) HF_TOKEN="$2"; shift ;;
         -p|--platform-url) PLATFORM_URL="$2"; shift ;;
+        -c|--client-ip-address) CLIENT_IP_ADDRESS="$2"; shift ;;
         -s|--secret-key-file) SECRET_KEY_FILE="$2"; shift ;;
         -t|--git-token) GIT_TOKEN="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
@@ -59,6 +61,8 @@ if [[ -z "$PLATFORM_URL" ]]; then
     exit 1
 fi
 
+# if PLATFORM_URL has http:// or https://, remove it
+PLATFORM_URL=$(echo $PLATFORM_URL | sed 's/https\?:\/\///')
 
 
 python3_version=$(python3 -V 2>&1 | grep -Po '(?<=Python )(.+)')
@@ -86,6 +90,7 @@ hf_token: $HF_TOKEN
 pg_user: $DATABASE_USER
 pg_password: $DATABASE_PASS
 platform_url: $PLATFORM_URL
+client_ip_address: $CLIENT_IP_ADDRESS
 " > $DIRECTORY/../ansible/custom_vars.yml
 
 

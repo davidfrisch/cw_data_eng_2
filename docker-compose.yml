@@ -104,8 +104,8 @@ services:
     container_name: backend
     depends_on:
       - postgres
-    # volumes:
-    #   - /mnt/data/shared:/mnt/data/shared
+    volumes:
+      - /mnt/data/shared:/mnt/data/shared
     build:
       context: ./backend
       dockerfile: Dockerfile

@@ -9,12 +9,18 @@
       name: "nfs-utils"
       state: latest
 
+  - name: Check that /mnt/data/shared exists
+    ansible.builtin.stat:
+      path: /mnt/data/shared
+    register: shared_dir
+
   - name: Create the NFS share
     ansible.builtin.file:
       path: /mnt/data/shared
       state: directory
       group: ec2-user
       owner: ec2-user
+    when: not shared_dir.stat.exists
 
   - name: Delete the existing line in /etc/exports
     ansible.builtin.lineinfile:
@@ -49,7 +55,7 @@
       boot: true
       state: mounted
       fstype: nfs
-      src: "{{ groups['client'][0] }}:/mnt/data/shared"
+      src: "{{ client_ip_address }}:/mnt/data/shared"
       path: /mnt/data/shared
       opts: defaults,_netdev
     
