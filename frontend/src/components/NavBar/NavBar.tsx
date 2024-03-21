@@ -42,7 +42,7 @@ const Navbar: FC = () => {
   }
 
   const handleVisitFileBrowser = () => {
-    const url = `${FRONTEND_URL}/${NEW_AUDIO_FOLDER_NAME}/`;
+    const url = `${FRONTEND_URL}/filebrowser/files/${NEW_AUDIO_FOLDER_NAME}`;
     window.open(url, '_blank');
   }
 

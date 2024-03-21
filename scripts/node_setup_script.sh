@@ -60,6 +60,7 @@ DOCKER_VITE_BACKEND_URL="http://$HOSTNAME/backend/v1"
 DOCKER_PREFECT_URL=http://$HOSTNAME:4201
 DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$HOSTNAME:5432/$DATABASE_NAME"
 DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$DATABASE_HOST:5432/$DATABASE_NAME"
+LOCAL_IP_ADDRESS=$(hostname -I | awk '{print $1}')
 
 # For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env
@@ -68,6 +69,7 @@ echo "PREFECT_UI_URL=$PREFECT_UI_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_API_URL=$PREFECT_API_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
+echo "HOST_IP=$LOCAL_IP_ADDRESS" >> $DIRECTORY/../pipeline/.env
 
 ### Docker with .env.compose or .env.staging
 # For prefect server
@@ -77,6 +79,7 @@ echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../pipeline/.env.co
 echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env.compose
 echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
+echo "HOST_IP=$LOCAL_IP_ADDRESS" >> $DIRECTORY/../pipeline/.env.compose
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
