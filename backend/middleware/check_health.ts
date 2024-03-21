@@ -5,13 +5,16 @@ export const checkDatabaseConnection = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
 
     const getDBStatus = async () => {
+      // create tables if they don't exist
+      
+
+
       try {
         await prisma.$connect();
         console.log("Connected to Prisma");
         return true;
       } catch (error) {
-        console.error("Error connecting to Prisma");
-
+        console.error(error);
       }
       return false;
     };

@@ -4,7 +4,7 @@
   become: true
 
   tasks:
-      - include_vars: ../vars.yml
+      - include_vars: ../../vars.yml
 
       - name: Leave the swarm
         command: docker swarm leave --force

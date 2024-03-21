@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const getDBStatus = async () => {
   try {
     await prisma.$connect();
+    await prisma.audio_results.findMany();
     console.log("Connected to Prisma");
     return true;
   } catch (error) {

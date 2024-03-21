@@ -4,7 +4,7 @@ set -e
 DIRECTORY=$(dirname $0)
 
 # Path in VMs
-SHARE_DIR="/mnt/beegfs/prefect_data/pipelines_audios"
+SHARE_DIR="/mnt/beegfs/prefect_data"
 # DOCKER_SHARE_DIR="/data"
 
 # For local
@@ -62,7 +62,7 @@ if [[ -z "$IP_ADDRESS" ]]; then
     exit 1
 fi
 
-DOCKER_VITE_BACKEND_URL="http://backend:3001/v1"
+DOCKER_VITE_BACKEND_URL="http://$HOSTNAME/backend/v1"
 DOCKER_PREFECT_URL=http://$HOSTNAME:4201
 DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$HOSTNAME:5432/$DATABASE_NAME"
 

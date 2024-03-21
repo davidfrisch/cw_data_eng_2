@@ -9,7 +9,7 @@
       shell:  cd {{ repo_dir }} && docker compose build
 
     - name: Docker compose up
-      shell:  cd {{ repo_dir }} && docker compose up -d
+      shell:  cd {{ repo_dir }} && docker compose up -d && docker compose down agent
     
     - name: You can now access the app 
       debug: msg="You can now access the app at http://{{ groups['client'][0] }}"
