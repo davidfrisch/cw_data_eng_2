@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { PREFECT_API_URL } from '../constants';
 
 class PrefectClient {
   private httpClient: AxiosInstance;
@@ -61,7 +62,7 @@ class PrefectClient {
 
 }
 
-const baseURL = 'http://ec2-35-178-107-122.eu-west-2.compute.amazonaws.com/api';
-const client = new PrefectClient(baseURL);
+// TODO: Update the baseURL with dynamic value
+const client = new PrefectClient(PREFECT_API_URL);
 
 export default client;

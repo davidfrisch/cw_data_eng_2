@@ -8,13 +8,14 @@ GIT_TOKEN=""
 HF_TOKEN=""
 PG_USER=""
 PG_PASSWORD=""
-
+PLATFORM_URL=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -du|--db-user) DATABASE_USER="$2"; shift ;;
         -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
         -hf|--hf-token) HF_TOKEN="$2"; shift ;;
+        -p|--platform-url) PLATFORM_URL="$2"; shift ;;
         -s|--secret-key-file) SECRET_KEY_FILE="$2"; shift ;;
         -t|--git-token) GIT_TOKEN="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
@@ -53,6 +54,10 @@ if [[ -z "$DATABASE_PASS" ]]; then
     exit 1
 fi
 
+if [[ -z "$PLATFORM_URL" ]]; then
+    echo "ERROR: platform url not specified!, -p|--platform-url"
+    exit 1
+fi
 
 
 
@@ -80,6 +85,7 @@ group: ec2-user
 hf_token: $HF_TOKEN
 pg_user: $DATABASE_USER
 pg_password: $DATABASE_PASS
+platform_url: $PLATFORM_URL
 " > $DIRECTORY/../ansible/custom_vars.yml
 
 

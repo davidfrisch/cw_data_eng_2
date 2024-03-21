@@ -15,7 +15,7 @@
 
 - name: Run node_setup_script.sh with arguments
   command: " {{ repo_dir }}/scripts/node_setup_script.sh \
-        -h {{ groups['client'][0] }} \
+        -h {{ platform_url }} \
         -t {{ hf_token }} \
         -db audio_results \
         -du {{ pg_user }} \

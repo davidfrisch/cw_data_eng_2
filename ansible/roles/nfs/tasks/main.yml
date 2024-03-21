@@ -1,0 +1,14 @@
+
+- name: Check that /mnt/data/shared exists
+  ansible.builtin.stat:
+    path: /mnt/data/shared
+  register: shared_dir
+
+- name: Create the NFS share
+  include_tasks: create_nfs.yml
+  when: not shared_dir.stat.exists
+
+- name: Echo the NFS share
+  ansible.builtin.debug:
+    msg: "NFS share is already created"
+  when: shared_dir.stat.exists

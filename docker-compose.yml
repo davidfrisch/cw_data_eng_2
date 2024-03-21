@@ -58,7 +58,7 @@ services:
     ports:
       - "4201:4200"
     volumes:
-      # - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+      # - /mnt/data/shared:/mnt/data/shared
       - ./pipeline:/app/pipeline
     depends_on:
       - postgres
@@ -81,7 +81,7 @@ services:
         limits:
           memory: 3gb
     volumes:
-      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+      - /mnt/data/shared:/mnt/data/shared
       - ./pipeline:/app/pipeline
       - ./sample_data:/app/sample_data
 
@@ -90,7 +90,7 @@ services:
     container_name: filebrowser
     restart: always
     volumes:
-      - /mnt/beegfs/prefect_data:/srv
+      - /mnt/data/shared:/srv
       - ./filebrowser/filebrowser.json:/.filebrowser.json
       # - ./filebrowser/filebrowser.json:/etc/config.json
       # - ./filebrowser/filebrowser.db:/database.db
@@ -104,8 +104,8 @@ services:
     container_name: backend
     depends_on:
       - postgres
-    volumes:
-      - /mnt/beegfs/prefect_data:/mnt/beegfs/prefect_data
+    # volumes:
+    #   - /mnt/data/shared:/mnt/data/shared
     build:
       context: ./backend
       dockerfile: Dockerfile

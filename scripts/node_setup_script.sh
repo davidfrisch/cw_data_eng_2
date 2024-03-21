@@ -4,7 +4,7 @@ set -e
 DIRECTORY=$(dirname $0)
 
 # Path in VMs
-SHARE_DIR="/mnt/beegfs/prefect_data"
+SHARE_DIR="/mnt/data/shared"
 # DOCKER_SHARE_DIR="/data"
 
 # For local
@@ -22,7 +22,6 @@ HF_TOKEN=""
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -h|--hostname) HOSTNAME="$2"; shift ;;
-        -ip|--ip-address) IP_ADDRESS="$2"; shift ;;
         -db|--db-name) DATABASE_NAME="$2"; shift ;;
         -du|--db-user) DATABASE_USER="$2"; shift ;;
         -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
@@ -31,10 +30,6 @@ while [[ "$#" -gt 0 ]]; do
     esac
     shift
 done
-
-if [[ -z "$HOSTNAME" ]] && [[ -n "$IP_ADDRESS" ]]; then
-    HOSTNAME=$IP_ADDRESS
-fi
 
 if [[ -z "$HOSTNAME" ]]; then
     echo "ERROR: hostname not specified!, use -h or --hostname"
@@ -52,19 +47,12 @@ if [[ -z "$DATABASE_PASS" ]]; then
 fi
 
 echo "CLIENT HOSTNAME=$HOSTNAME"
-if [[ -z "$IP_ADDRESS" ]]; then
-    IP_ADDRESS=$(nslookup "$HOSTNAME" | awk '/^Address: / { print $2 }')
-fi
 
-
-if [[ -z "$IP_ADDRESS" ]]; then
-    echo "ERROR: IP address not found in DNS!"
-    exit 1
-fi
 
 DOCKER_VITE_BACKEND_URL="http://$HOSTNAME/backend/v1"
 DOCKER_PREFECT_URL=http://$HOSTNAME:4201
 DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$HOSTNAME:5432/$DATABASE_NAME"
+DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
 
 # For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env
@@ -81,15 +69,17 @@ echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env.compose
-echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
+echo "DATABASE_URL=$DOCKER_DATABASE_URL" >> $DIRECTORY/../pipeline/.env.compose
 
 # For backend
 echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env
 echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env
+echo "PREFECT_API_URL=$PREFECT_API_URL" >> $DIRECTORY/../backend/.env
 
 # For backend with .env.compose
-echo "DATABASE_URL=$DATABASE_URL" > $DIRECTORY/../backend/.env.compose
+echo "DATABASE_URL=$DOCKER_DATABASE_URL" > $DIRECTORY/../backend/.env.compose
 echo "SHARE_DIR=$SHARE_DIR" >> $DIRECTORY/../backend/.env.compose
+echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../backend/.env.compose
 
 
 # For frontend
