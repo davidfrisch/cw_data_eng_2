@@ -10,9 +10,7 @@
 
     - name: Docker compose up
       shell:  cd {{ repo_dir }} && docker compose up -d && docker compose down agent
-    
-    - name: You can now access the app 
-      debug: msg="You can now access the app at http://{{ groups['client'][0] }}"
+
 
 - name: Start Cluster Playbook
   hosts: clusters
@@ -23,3 +21,6 @@
 
     - name: Docker compose up 
       shell:  cd {{ repo_dir }} && docker compose up agent -d
+
+    - name: You can now access the app 
+      debug: msg="You can now access the app at http://{{ groups['client'][0] }}"

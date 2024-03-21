@@ -17,6 +17,7 @@ HOSTNAME=""
 DATABASE_NAME=audio_results
 DATABASE_USER=""
 DATABASE_PASS=""
+DATABASE_HOST=""
 HF_TOKEN=""
 
 while [[ "$#" -gt 0 ]]; do
@@ -25,6 +26,7 @@ while [[ "$#" -gt 0 ]]; do
         -db|--db-name) DATABASE_NAME="$2"; shift ;;
         -du|--db-user) DATABASE_USER="$2"; shift ;;
         -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
+        -dh|--db-host) DATABASE_HOST="$2"; shift ;;
         -t|--hf-token) HF_TOKEN="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
@@ -46,13 +48,18 @@ if [[ -z "$DATABASE_PASS" ]]; then
     exit 1
 fi
 
+if [[ -z "$DATABASE_HOST" ]]; then
+    echo "ERROR: database host not specified!, -dh|--db-host"
+    exit 1
+fi
+
 echo "CLIENT HOSTNAME=$HOSTNAME"
 
 
 DOCKER_VITE_BACKEND_URL="http://$HOSTNAME/backend/v1"
 DOCKER_PREFECT_URL=http://$HOSTNAME:4201
 DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$HOSTNAME:5432/$DATABASE_NAME"
-DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@postgres:5432/$DATABASE_NAME"
+DOCKER_DATABASE_URL="postgresql://$DATABASE_USER:$DATABASE_PASS@$DATABASE_HOST:5432/$DATABASE_NAME"
 
 # For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env

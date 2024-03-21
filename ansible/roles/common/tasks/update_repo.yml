@@ -18,6 +18,7 @@
         -h {{ platform_url }} \
         -t {{ hf_token }} \
         -db audio_results \
+        -dh {{ client_ip_address }} \
         -du {{ pg_user }} \
         -dp {{ pg_password }} "
         
