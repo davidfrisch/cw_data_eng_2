@@ -18,6 +18,7 @@ jobs:
           ./scripts/node_setup_script.sh \
               -h localhost \
               -t ${{ secrets.HF_TOKEN }} \
+              -dh localhost \
               -db audio_results \
               -du ${{ secrets.PG_USER }} \
               -dp ${{ secrets.PG_PASSWORD }} 
