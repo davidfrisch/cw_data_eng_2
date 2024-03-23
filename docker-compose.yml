@@ -62,7 +62,6 @@ services:
     depends_on:
       - postgres
     deploy:
-      endpoint_mode: vip
       replicas: 1
       placement:
         constraints:
@@ -74,7 +73,6 @@ services:
       - pipeline/.env.compose
     entrypoint: [ 'python3', '/app/pipeline/pipeline.py' ]
     deploy:
-      endpoint_mode: vip
       replicas: 1
       resources:
         limits:
@@ -121,6 +119,8 @@ services:
     image: prom/prometheus:v2.50.1
     container_name: prometheus
     command: "--config.file=/etc/prometheus/prometheus.yaml"
+    ports:
+      - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yaml
       - prometheus-data:/prometheus

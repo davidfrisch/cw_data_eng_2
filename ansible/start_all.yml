@@ -20,7 +20,7 @@
     - include_vars: custom_vars.yml
 
     - name: Docker compose up 
-      shell:  cd {{ repo_dir }} && docker compose up agent -d
+      shell:  cd {{ repo_dir }} && docker compose up agent node_exporter cadvisor -d
 
     - name: You can now access the app 
       debug: msg="You can now access the app at http://{{ groups['client'][0] }}"
