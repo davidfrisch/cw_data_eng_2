@@ -6,12 +6,11 @@
     - include_vars: vars.yml
     - include_vars: custom_vars.yml
 
-    - name: Include NFS role
-      import_role:
-        name: nfs
-
     - name: Include common role
       import_role:
         name: common
 
+    - name: Include NFS role
+      import_role:
+        name: nfs
 
