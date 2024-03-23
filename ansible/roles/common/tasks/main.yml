@@ -32,7 +32,7 @@
   include_tasks: tasks/update_repo.yml
 
 - name: Pull containers
-  run: cd {{ repo_dir }} && docker-compose pull
+  shell: cd {{ repo_dir }} && docker compose pull
 
 
 
