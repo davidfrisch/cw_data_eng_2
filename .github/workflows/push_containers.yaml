@@ -2,6 +2,10 @@ name: Publish Docker image
 
 on:
   workflow_dispatch:
+    inputs:
+      host:
+        description: 'Hostname of the server'
+        required: true
     
 
 jobs:
@@ -15,9 +19,9 @@ jobs:
       - name: Run the setup script
         run: |
           ./scripts/node_setup_script.sh \
-              -h localhost \
+              -h ${{ github.event.inputs.host }} \
               -t ${{ secrets.HF_TOKEN }} \
-              -dh localhost \
+              -dh postgres \
               -db audio_results \
               -du ${{ secrets.PG_USER }} \
               -dp ${{ secrets.PG_PASSWORD }} 
