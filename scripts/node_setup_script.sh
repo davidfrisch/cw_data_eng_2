@@ -19,6 +19,7 @@ DATABASE_USER=""
 DATABASE_PASS=""
 DATABASE_HOST=""
 HF_TOKEN=""
+HF_HOME="/mnt/data"
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -27,7 +28,9 @@ while [[ "$#" -gt 0 ]]; do
         -du|--db-user) DATABASE_USER="$2"; shift ;;
         -dp|--db-pass) DATABASE_PASS="$2"; shift ;;
         -dh|--db-host) DATABASE_HOST="$2"; shift ;;
+        -s|--share-dir) SHARE_DIR="$2"; shift ;;
         -t|--hf-token) HF_TOKEN="$2"; shift ;;
+        -hf|--hf-home) HF_HOME="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
@@ -68,12 +71,14 @@ echo "DATABASE_URL=$DATABASE_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_UI_URL=$PREFECT_UI_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_API_URL=$PREFECT_API_URL" >> $DIRECTORY/../pipeline/.env
 echo "PREFECT_RUNNER_PROCESS_LIMIT=1" >> $DIRECTORY/../pipeline/.env
+echo "HF_HOME=$HF_HOME" >> $DIRECTORY/../pipeline/.env
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env
 echo "HOST_IP=$LOCAL_IP_ADDRESS" >> $DIRECTORY/../pipeline/.env
 
 ### Docker with .env.compose or .env.staging
 # For prefect server
 echo "SHARE_DIR=$SHARE_DIR" > $DIRECTORY/../pipeline/.env.compose
+echo "HF_HOME=$HF_HOME" >> $DIRECTORY/../pipeline/.env.compose
 echo "HF_TOKEN=$HF_TOKEN" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_API_URL=$DOCKER_PREFECT_URL/api" >> $DIRECTORY/../pipeline/.env.compose
 echo "PREFECT_UI_URL=$DOCKER_PREFECT_URL" >> $DIRECTORY/../pipeline/.env.compose
