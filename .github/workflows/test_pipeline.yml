@@ -1,0 +1,54 @@
+name: Test the pipeline
+
+on:
+  push:
+    branches:
+      - main
+    
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      
+      - name: Setup FFmpeg
+        uses: federicocarboni/setup-ffmpeg@v3.1
+    
+      - name: Run the setup script
+        run: |
+          ./scripts/node_setup_script.sh \
+              -h localhost \
+              -t ${{ secrets.HF_TOKEN }} \
+              --hf-home ./pipeline \
+              --share-dir ./pipeline \
+              -dh postgres \
+              -db audio_results \
+              -du ${{ secrets.PG_USER }} \
+              -dp ${{ secrets.PG_PASSWORD }} 
+
+
+      - name: Change directory and go in pipeline
+        run: |
+          cd pipeline
+          pip install -r requirements.txt
+
+      - name: Start the database
+        run: |
+          docker compose up postgres -d 
+    
+      - name: Run the pipeline
+        run: |
+          python ./pipeline/pipeline.py --local sample_data/audio_example_2.wav
+   

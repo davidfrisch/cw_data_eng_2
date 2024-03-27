@@ -40,5 +40,3 @@ def cut_audio(input_file, output_folder, min_per_split):
   filenames = split_wav.multiple_split(min_per_split)
   return filenames
 
-
-# cut_audio('/mnt/data/cw_data_eng_2/data/wavs/0638.wav', '/mnt/data/cw_data_eng_2/data/output', 5)
