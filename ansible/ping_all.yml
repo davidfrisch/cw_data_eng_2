@@ -1,5 +1,5 @@
 - name: Ping all hosts
-  hosts: coursemachines
+  hosts: client, clusters
   tasks:
     - include_vars: custom_vars.yml
     - name: Ping all hosts

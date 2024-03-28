@@ -28,11 +28,17 @@
       state: absent
       regexp: "^/mnt/data/shared.*$"
 
-  - name: Write in /etc/exports
+  - name: Write in /etc/exports in client
     ansible.builtin.lineinfile:
       path: /etc/exports
       line: "/mnt/data/shared {{ item }}(rw,sync,no_root_squash)"
-    with_items: "{{ groups['coursemachines'] }}"
+    with_items: "{{ groups['client'] }}" 
+
+  - name: Write in /etc/exports in clusters
+    ansible.builtin.lineinfile:
+      path: /etc/exports
+      line: "/mnt/data/shared {{ item }}(rw,sync,no_root_squash)"
+    with_items: "{{ groups['clusters'] }}"
 
   - name: Export the NFS share
     ansible.builtin.shell: exportfs -a

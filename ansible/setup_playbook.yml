@@ -1,5 +1,5 @@
 - name: Setup playbook
-  hosts: coursemachines
+  hosts: client, clusters
   become: true
 
   tasks:
