@@ -6,8 +6,7 @@ from diarization import diarization
 from conv_emotions import process_emotions
 from conv_rank import rank_conversations
 from summary import generate_summary
-from prefect import flow
-from prefect.client import get_client
+from prefect import flow, get_run_logger
 from constants import DATA_DIR, HOST_IP
 from prefect_utils import get_flow_run_id
 from db import create_session
@@ -19,6 +18,7 @@ from models.audio_results import AudioResults
 def pipeline(audio_path: str, keep_output_folder: bool = True):
     session = create_session()
     flow_run_id = get_flow_run_id()
+    logger = get_run_logger()
     
     vm_worker_id = HOST_IP or os.environ.get('HOSTNAME')
     update_audio_results = session.query(AudioResults).filter(AudioResults.flow_run_id == flow_run_id).first()
@@ -80,7 +80,7 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
         session.add(update_audio_results)
         session.commit()
     except Exception as e:
-        print(f"Error updating audio path in db: {e}")
+        logger.error(f"Error updating audio path in db: {e}")
     
     
     session.close()

@@ -7,12 +7,14 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(dotenv_path=os.path.join(current_dir, "../env"))
 from prefect import task
+from prefect import get_run_logger
 from typing import List
 from cut_audio import cut_audio
 from pyannote.audio import Pipeline
 
 
 def child_diarization(input_audio, output_file):
+  logger = get_run_logger()
   diarization_pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.0",
     use_auth_token=os.getenv("HF_TOKEN")
@@ -24,6 +26,7 @@ def child_diarization(input_audio, output_file):
   )
   
   if not diarization_pipeline or not asr_pipeline:
+    logger.error("Error loading diarization or asr pipeline")
     raise ValueError("Error loading diarization or asr pipeline")
 
   final_pipeline = ASRDiarizationPipeline(
@@ -33,7 +36,7 @@ def child_diarization(input_audio, output_file):
   final_pipeline.embedding_batch_size=0.5
   final_pipeline.segmentation_batch_size=0.5
 
-  print(f"Processing {input_audio}")
+  logger.info(f"Processing {input_audio}")
   outputs = final_pipeline(input_audio)
   
   all_text = ""

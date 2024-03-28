@@ -17,8 +17,6 @@ def process_emotions(input_file, output_file):
     data = json.loads(f.read())
     speakers = data['speakers']
 
-  sorted_data = lambda y: sorted(y, key=lambda x: x["score"], reverse=True)
-
   for speaker_id in speakers:
     text = speakers[speaker_id]['text']
     batch_size = 511
