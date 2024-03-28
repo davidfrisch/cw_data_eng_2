@@ -3,10 +3,10 @@ from transformers import pipeline
 from pyannote.audio import Pipeline
 import json
 from dotenv import load_dotenv
-load_dotenv('../.env')
 import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(dotenv_path=os.path.join(current_dir, "../env"))
 from prefect import task
-import asyncio
 from typing import List
 from cut_audio import cut_audio
 from pyannote.audio import Pipeline

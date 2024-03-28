@@ -48,7 +48,11 @@ jobs:
         run: |
           docker compose up postgres -d 
     
+      - name: Run the tests
+        run: |
+          python -m pytest tests/
+
       - name: Run the pipeline
         run: |
-          python ./pipeline/pipeline.py --local sample_data/audio_example_2.wav
+          python ./pipeline/pipeline.py --local sample_data/audio_example.wav
    
