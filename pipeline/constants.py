@@ -14,6 +14,6 @@ if not os.getenv("HOST_IP"):
 if not os.getenv("SHARE_DIR"):
   raise ValueError("SHARE_DIR not found in .env file")
 
-DATA_DIR = f"{SHARE_DIR}/shared/pipelines_audios"
+DATA_DIR = f"{SHARE_DIR}/pipelines_audios"
 DATABASE_URL=os.getenv("DATABASE_URL")
 HOST_IP = os.getenv("HOST_IP")

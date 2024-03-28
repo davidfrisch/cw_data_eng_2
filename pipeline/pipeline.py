@@ -86,6 +86,8 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
     session.close()
     if not keep_output_folder:
         os.system(f"rm -rf {output_folder}")
+        
+    return output_folder
   
 if __name__ == '__main__':
   if len(sys.argv) > 2 and sys.argv[1] == '--local':

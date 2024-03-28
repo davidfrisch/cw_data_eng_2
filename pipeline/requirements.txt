@@ -8,3 +8,4 @@ pydub
 onnxruntime
 sqlalchemy_utils
 psycopg2-binary
+pytest
