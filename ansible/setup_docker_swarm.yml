@@ -1,0 +1,32 @@
+- name: Start Client Playbook
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Docker compose pull
+      shell:  cd {{ repo_dir }} && docker compose pull
+
+    - name: create docker swarm
+      include_role:
+        name: docker_swarm
+        tasks_from: create_swarm.yml
+
+
+
+- name: Start Cluster Playbook
+  hosts: clusters
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+
+    - name: Pull the images
+      shell:  cd {{ repo_dir }} && docker compose pull
+    
+    - name: Join the swarm
+      include_role:
+        name: docker_swarm
+        tasks_from: join_swarm.yml
+
