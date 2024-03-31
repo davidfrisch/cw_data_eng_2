@@ -1,4 +1,3 @@
-""" TMPDIR=/mnt/data pip install -r requirements.txt --no-cache --cache-dir=/mnt/data/pip_cache """
 import os 
 import sys
 
@@ -76,6 +75,7 @@ def pipeline(audio_path: str, keep_output_folder: bool = True):
     os.system(f"mv {audio_path} {output_folder}")
     # update audio path in db
     try:
+        update_audio_results = session.query(AudioResults).filter(AudioResults.flow_run_id == flow_run_id).first()
         update_audio_results.audio_path = f"{output_folder}/{os.path.basename(audio_path)}"
         session.add(update_audio_results)
         session.commit()
