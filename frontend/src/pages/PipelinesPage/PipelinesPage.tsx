@@ -17,15 +17,25 @@ export default function PipelinesPage() {
   const [numWaitingForRefresh, setNumWaitingForRefresh] = useState(0);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [currentStatus, setCurrentStatus] = useState("all" as string);
+  const [countPipelinesStatus, setCountPipelinesStatus] = useState({} as any);
   const navigate = useNavigate();
 
   async function getPipelines() {
     try {
       setIsLoading(true);
       const response = await api.pipelines.getAll();
-      console.log(response.data);
       setPipelines(response.data);
       setFilteredPipelines(response.data)
+      const countPipelinesStatus = response.data.reduce((acc: any, pipeline: Pipeline) => {
+        if (pipeline?.status) {
+          acc[pipeline.status.toLowerCase()] = acc[pipeline.status.toLowerCase()] ? acc[pipeline.status.toLowerCase()] + 1 : 1;
+        } 
+        
+        acc["all"] = acc["all"] ? acc["all"] + 1 : 1;
+        
+        return acc;
+      }, {});
+      setCountPipelinesStatus(countPipelinesStatus);
     } catch (error) {
       console.error(error);
     } finally {
@@ -98,15 +108,15 @@ export default function PipelinesPage() {
       </div>}
       <Container>
         <Container sx={{ display: "flex", justifyContent: "flex-start" }}>
-          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter(["all"])}>ALL</Button>
-          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "scheduled" ? "secondary" : "primary"} onClick={() => handleFilter(scheduledStatus)}>SCHEDULED</Button>
-          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter(runningStatus)}>RUNNING</Button>
-          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter(completedStatus)}>COMPLETED</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "all" ? "secondary" : "primary"} onClick={() => handleFilter(["all"])}>ALL {countPipelinesStatus["all"] && "("+countPipelinesStatus["all"]+")"}</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "scheduled" ? "secondary" : "primary"} onClick={() => handleFilter(scheduledStatus)}>SCHEDULED {countPipelinesStatus["scheduled"] && "("+countPipelinesStatus["scheduled"]+")"}</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "running" ? "secondary" : "primary"} onClick={() => handleFilter(runningStatus)}>RUNNING {countPipelinesStatus["running"] && "("+countPipelinesStatus["running"]+")"}</Button>
+          <Button sx={{ marginRight: "14px" }} variant="contained" color={currentStatus === "completed" ? "secondary" : "primary"} onClick={() => handleFilter(completedStatus)}>COMPLETED {countPipelinesStatus["completed"] && "("+countPipelinesStatus["completed"]+")"}</Button>
           <Button variant="contained" color={currentStatus === "failed" ? "secondary" : "primary"} onClick={() => handleFilter(failedStatus)}>FAILED</Button>
         </Container>
         <Container sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Button variant="contained" color="primary" onClick={handleDownloadPipelines}>
-            Download Pipelines
+            Download Pipelines ({filteredPipelines.length})
           </Button>
         </Container>
       </Container>
