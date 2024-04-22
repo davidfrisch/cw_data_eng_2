@@ -13,6 +13,7 @@ services:
     volumes:
       - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
+      - backend
       - filebrowser
     deploy:
       placement:
@@ -83,7 +84,7 @@ services:
       - ./sample_data:/app/sample_data
 
   filebrowser:
-    image: filebrowser/filebrowser
+    image: filebrowser/filebrowser:v2.27.0
     container_name: filebrowser
     restart: always
     volumes:
@@ -114,6 +115,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+    # ports:
+    #   - "3001:3001"
 
   prometheus:
     image: prom/prometheus:v2.50.1
