@@ -144,6 +144,9 @@ services:
         published: 9100
         mode: host
     deploy:
+      replicas: 4
+      placement:
+        max_replicas_per_node: 1
       resources:
         limits:
           cpus: '1'
@@ -166,7 +169,6 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
-    container_name: cadvisor
     ports:
       - 8080:8080
     volumes:
@@ -181,7 +183,9 @@ services:
     restart: unless-stopped
     deploy:
       endpoint_mode: vip
-      replicas: 1
+      replicas: 4
+      placement:
+        max_replicas_per_node: 1
 
           
     
