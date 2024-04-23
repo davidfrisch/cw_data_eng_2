@@ -9,7 +9,7 @@ SHARE_DIR="/mnt/data/shared"
 
 # For local
 PREFECT_UI_URL="http://localhost:4200"
-PREFECT_API_URL=$PREFECT_UI_URL+"/api"
+PREFECT_API_URL=$PREFECT_UI_URL"/api"
 VITE_BACKEND_URL="http://localhost:3001"
 
 # USER SPECIFIC VARIABLES
