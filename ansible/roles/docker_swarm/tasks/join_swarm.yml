@@ -7,7 +7,7 @@
 
   - name: Copy swarm join token file to remote host
     copy:
-      src: "{{ repo_dir }}/swarm_join_token.txt"
+      src: "swarm_join_token.txt"
       dest: /tmp/swarm_join_token.txt
     become: true
     become_user: root

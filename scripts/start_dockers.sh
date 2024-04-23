@@ -4,5 +4,4 @@ set -e
 
 DIRECTORY=$(dirname $0)
 
-docker stack deploy --compose-file docker-compose.yml data_eng
-
+ansible-playbook -i $DIRECTORY/../ansible/inventory.ini $DIRECTORY/../ansible/start_docker.yml

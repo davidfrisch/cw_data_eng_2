@@ -75,7 +75,7 @@ Run the Ansible playbook:
 
 ### Note
 
-⚠️ It will take approximately XX minutes to complete the setup.
+⚠️ It will take approximately 10~20 minutes to complete the setup.
 
 💡 Monitor the progress of the Ansible script using:
 

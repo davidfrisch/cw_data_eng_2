@@ -13,4 +13,4 @@ This repository contains coursework from the Data Engineering 2 module, which fo
 - To read the startup guide, please visit [startup_guide.md](docs/startup_guide.md).
 
 ## Example
-- To see an example of the platform, please visit [http://ec2-35-178-107-122.eu-west-2.compute.amazonaws.com](http://ec2-35-178-107-122.eu-west-2.compute.amazonaws.com).
+- To see an example of the platform, please visit [ec2-3-10-170-172.eu-west-2.compute.amazonaws.com](ec2-3-10-170-172.eu-west-2.compute.amazonaws.com).

@@ -4,6 +4,9 @@
       name: "*"
       state: latest
 
+  - name: Ping to {{ client_ip_address }} client
+    shell: ping -c 1 {{ client_ip_address }}
+  
   - name: NFS tools
     ansible.builtin.dnf:
       name: "nfs-utils"

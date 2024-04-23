@@ -1,0 +1,13 @@
+- name: Start Platform
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+  
+    - name: Start platform
+      shell:  cd {{ repo_dir }} && docker stack deploy --compose-file docker-compose.yml data_eng
+
+    - name: Message
+      debug:
+        msg: "Platform URL: {{ platform_url }}"

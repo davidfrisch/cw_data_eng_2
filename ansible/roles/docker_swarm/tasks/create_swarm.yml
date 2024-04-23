@@ -19,6 +19,9 @@
       dest: "{{ repo_dir }}/swarm_join_token.txt"
     when: swarm_join_token.stdout is defined
 
-
-      
-            
+  - name: Copy swarm join token file to remote host
+    fetch:
+      flat: true
+      src: "{{ repo_dir}}/swarm_join_token.txt"
+      dest: "swarm_join_token.txt"
+    when: swarm_join_token.stdout is defined  

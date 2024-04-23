@@ -5,6 +5,13 @@
     - include_vars: vars.yml
     - include_vars: custom_vars.yml
 
+    - name: Update nginx config
+      become: yes
+      ansible.builtin.replace:
+        path: '{{ repo_dir }}/frontend/nginx.conf'
+        regexp: 'server_name .*;'
+        replace: 'server_name {{ platform_url }};'
+
     - name: Docker compose pull
       shell:  cd {{ repo_dir }} && docker compose pull
 
