@@ -1,0 +1,17 @@
+- name: Download audio file
+  hosts: client
+  become: true
+  tasks:
+
+    - name: Check that /mnt/data/shared/new_audios exists
+      ansible.builtin.file:
+        path: /mnt/data/shared/new_audios
+        state: directory
+        group: ec2-user
+        owner: ec2-user
+
+    - name: Download CallHome audios
+      shell: cd /mnt/data/shared/new_audios && wget -r -np -nd -A wav --no-check-certificate https://media.talkbank.org/ca/CallHome/eng/0wav/ 
+
+    - name: Download CallFriend audios
+      shell: cd /mnt/data/shared/new_audios && wget -r -np -nd -A wav --no-check-certificate https://media.talkbank.org/ca/CallFriend/eng-n/0wav/

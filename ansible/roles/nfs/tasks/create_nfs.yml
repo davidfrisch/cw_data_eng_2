@@ -12,12 +12,17 @@
       name: "nfs-utils"
       state: latest
 
+  - name: wget tools
+    ansible.builtin.dnf:
+      name: "wget"
+      state: latest
+
   - name: Check that /mnt/data/shared exists
     ansible.builtin.stat:
       path: /mnt/data/shared
     register: shared_dir
 
-  - name: Create the NFS share
+  - name: Create folder the NFS share
     ansible.builtin.file:
       path: /mnt/data/shared
       state: directory
@@ -25,39 +30,41 @@
       owner: ec2-user
     when: not shared_dir.stat.exists
 
+#### Only for client
   - name: Delete the existing line in /etc/exports
     ansible.builtin.lineinfile:
       path: /etc/exports
       state: absent
       regexp: "^/mnt/data/shared.*$"
+    when: "'client' in group_names"   
 
   - name: Write in /etc/exports in client
     ansible.builtin.lineinfile:
       path: /etc/exports
-      line: "/mnt/data/shared {{ item }}(rw,sync,no_root_squash)"
+      line: "/mnt/data/shared {{ item }}(rw,sync,no_all_squash,no_root_squash)"
+    when: "'client' in group_names"
     with_items: "{{ groups['client'] }}" 
+
 
   - name: Write in /etc/exports in clusters
     ansible.builtin.lineinfile:
       path: /etc/exports
-      line: "/mnt/data/shared {{ item }}(rw,sync,no_root_squash)"
+      line: "/mnt/data/shared {{ item }}(rw,sync,no_all_squash,no_root_squash)"
+    when: "'client' in group_names"
     with_items: "{{ groups['clusters'] }}"
 
   - name: Export the NFS share
     ansible.builtin.shell: exportfs -a
+    when: "'client' in group_names"
 
   - name: Enable the NFS server
     ansible.builtin.systemd:
       name: nfs-server
       enabled: yes
       state: started
+    when: "'client' in group_names"
 
-  - name: NFS mountpoint
-    ansible.builtin.file:
-      path: /mnt/data/shared
-      state: directory
-      group: ec2-user
-      owner: ec2-user
+#############
 
   - name: NFS fstab
     ansible.posix.mount:

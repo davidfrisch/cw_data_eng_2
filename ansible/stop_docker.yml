@@ -1,0 +1,11 @@
+- name: Stop Platform
+  hosts: client
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: custom_vars.yml
+  
+ 
+    - name: stop platform
+      shell:  cd {{ repo_dir }} && docker stack down data_eng
+

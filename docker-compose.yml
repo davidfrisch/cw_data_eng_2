@@ -74,7 +74,11 @@ services:
       - pipeline/.env.compose
     entrypoint: [ 'python3', '/app/pipeline/pipeline.py' ]
     deploy:
-      replicas: 1
+      replicas: 4
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - node.role == worker
       resources:
         limits:
           memory: 3gb

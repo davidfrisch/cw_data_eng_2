@@ -5,6 +5,9 @@
     - include_vars: vars.yml
     - include_vars: custom_vars.yml
   
+    - name: build frontend
+      shell:  cd {{ repo_dir }} && docker compose build frontend
+
     - name: Start platform
       shell:  cd {{ repo_dir }} && docker stack deploy --compose-file docker-compose.yml data_eng
 
