@@ -8,7 +8,7 @@ This repository contains coursework from the Data Engineering 2 module, which fo
 
 
 ## Guides
-- To read the report of the coursework, please visit [DataEng2_CW.pdf](DataEng2_CW.pdf).
+- To read the report of the coursework, please visit [DataEng2_CW.pdf](docs/DataEng_CW_2.pdf).
 - To read the setup guide, please visit [setup_guide.md](docs/setup_guide.md).
 - To read the startup guide, please visit [startup_guide.md](docs/startup_guide.md).
 
