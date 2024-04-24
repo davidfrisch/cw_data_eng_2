@@ -73,6 +73,13 @@ Run the Ansible playbook:
 ./scripts/setup_ansible_script.sh
 ```
 
+
+## Setup prometheus
+
+Update the `prometheus/prometheus.yml` file with the IP addresses of the clusters for the job name:
+- job_name: 'node_exporter'
+- job_name: 'cadvisor'  
+
 ### Note
 
 ⚠️ It will take approximately 10~20 minutes to complete the setup.

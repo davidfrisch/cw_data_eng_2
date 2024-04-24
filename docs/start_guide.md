@@ -92,6 +92,11 @@ From the web application, you can filter the flow runs by status and click on th
 
 From the web application, you can filter the flow runs by status and click on the 'Download' button of the pipeline card to download the results of all the displayed flow runs. This will download a json file containing the data of the flow runs.
 
+
+## Setup the grafana dashboard
+Copy paste the grafana dashboard json file in the `grafana/dashboards/node_exporter_dashboard.json` file. Then, you can import the dashboard in the grafana UI.
+
+
 ## Stop the docker swarm cluster
 
 To stop the docker swarm cluster, run the following command:
